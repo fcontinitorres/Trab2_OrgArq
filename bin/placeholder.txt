@@ -1,0 +1,1 @@
+Impedir que a pasta seja deletada entre commits
