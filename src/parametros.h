@@ -10,11 +10,11 @@ Bruno Henrique Rasteiro, 9292910
 #define SIZE_CNPJ 18
 #define SIZE_DATA 8
 
-// delimitador do registro no arquivo de saída
+// delimitador do registro no arquivo de saí­da
 #define DEL_REG '#'
 
 // delimitador do campo arquivo de saída
-#define DEL_FIELD ';'
+#define DEL_FIELD ';' // TODO: mudar delimitador de campo
 
 // caminho do arquivo de entrada
 #define FILE_IN "data/dados.csv"
