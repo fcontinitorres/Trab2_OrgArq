@@ -10,7 +10,7 @@ Bruno Henrique Rasteiro, 9292910
 
 /*	Descrição:
 		Abre os arquivos de entrada e saída do programa
-	Parêmetros:
+	Parâmetros:
 		entrada = arquivo de entrada
 		saida1 = arquivo de saída
 		saida2 = arquivo de saída
@@ -18,7 +18,8 @@ Bruno Henrique Rasteiro, 9292910
 	Retorno:
 		Retorna um int que indica o sucesso da função. Os possíves valores são:
 		1 -> Arquivos aberto com sucesso
-		2 -> Falha ao abrir arquivos */
+		2 -> Falha ao abrir arquivos
+*/
 int validaArquivos(FILE **entrada, FILE **saida1, FILE **saida2, FILE **saida3) {
 
 	// abrindo arquivos
@@ -29,22 +30,22 @@ int validaArquivos(FILE **entrada, FILE **saida1, FILE **saida2, FILE **saida3) 
 
     if (*entrada == NULL) {
     	printf("Erro ao abrir: %s\n", FILE_IN);
-    	return(0);
+    	return EXIT_FAILURE;
     }
 
     if (*saida1 == NULL) {
     	printf("Erro ao abrir: %s\n", FILE_OUT1);
-    	return(0);
+    	return EXIT_FAILURE;
     }
 
     if (*saida2 == NULL) {
     	printf("Erro ao abrir: %s\n", FILE_OUT2);
-    	return(0);
+    	return EXIT_FAILURE;
     }
 
     if (*saida3 == NULL) {
     	printf("Erro ao abrir: %s\n", FILE_OUT3);
-    	return(0);
+    	return EXIT_FAILURE;
     }
 
     return(1);
@@ -52,8 +53,9 @@ int validaArquivos(FILE **entrada, FILE **saida1, FILE **saida2, FILE **saida3) 
 
 /*	Descrição:
 		Realiza as tarefas para executar a primeira opção do menu
-	Parêmetros:
-		file = arquivo de saida (binário) */
+	Parâmetros:
+		file = arquivo de saida (binário)
+*/
 void opcao1(FILE *file) {
 	// lista todos os dados
 	listarBinario(file);
@@ -64,14 +66,15 @@ void opcao1(FILE *file) {
 
 /*	Descrição:
 		Realiza as tarefas para executar a segunda opção do menu
-	Parêmetros:
-		file = arquivo de saida (binário) */
+	Parâmetros:
+		file = arquivo de saida (binário)
+*/
 void opcao2(FILE *file) {
 	char *strBusca; // valor que a busca irá usar para comparar
 	Registro *reg; // registro resultante da busca
 
 	// espera o valor da busca
-	printf("Informe o cnpj a ser buscado: ");
+	printf("Informe o CNPJ a ser buscado: ");
 	strBusca = NULL;
 	scanf("%ms", &strBusca);
 

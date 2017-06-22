@@ -6,18 +6,22 @@ Júlia Diniz Ferreira, 9364865
 Bruno Henrique Rasteiro, 9292910
 */
 
+#include <locale.h>
 #include "registro.h"
 #include "menu.h"
 
 int main() {
 
-	int flag;
-	int opcao;
-	FILE *entrada, *saida1, *saida2, *saida3;
+	int flag; // determina se o programa deve continuar no menu
+	int opcao; // opção para o menu, escolhida pelo usuário
+
+	FILE *entrada, *saida1, *saida2, *saida3; // arquivos de dados
+	FILE *indice1, *indice2, *indice3; // arquivos de índice primário
 
 	// verifica se os arquivos foram abertos com sucesso
 	if (!validaArquivos(&entrada, &saida1, &saida2, &saida3)) {
-		return(0);
+		printf("ERRO AO ABRIR ARQUIVOS\n");
+		return EXIT_FAILURE;
 	}
 
 	printf("\n++++++++++++++++++++++++++++++++++++++++\n");
@@ -26,6 +30,9 @@ int main() {
 
 	// gera arquivos de saida (binario)
 	csv2Bin(entrada, saida1, saida2, saida3);
+
+	// gerar arquivos de índice primário
+	
 
 	// fechando arquivo de entrada
 	fclose(entrada);
@@ -82,7 +89,7 @@ int main() {
 				break;
 
 			default:
-				printf("\nOpcao invalida.\n");
+				printf("\nOpção inválida.\n");
 		}
 	}
 
@@ -90,4 +97,8 @@ int main() {
 	fclose(saida1);
 	fclose(saida2);
 	fclose(saida3);
+
+	// TODO - Destruir índices
+	// TODO - Destruir qualquer coisa alocada em heap
+
 }

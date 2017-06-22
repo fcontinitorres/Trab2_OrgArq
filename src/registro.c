@@ -1,3 +1,11 @@
+/*
+GRUPO G5
+Felipe Scrochio Custodio, 9442688
+Felipe Contini Torres, 9253670
+Júlia Diniz Ferreira, 9364865
+Bruno Henrique Rasteiro, 9292910
+*/
+
 #include "registro.h"
 
 //************************************************//
@@ -6,24 +14,27 @@
 
 /*	Descrição:
 		Lê os dados em um arquivo de entrada e os salva de forma organizada em um arquivo de saída
-	Parêmetros:
+	Parâmetros:
 		entrada = Arquivo de entrada
-		saida1 = Arquvio de saída
-		saida2 = Arquvio de saída
-		saida3 = Arquvio de saída */
+		saida1 = Arquivo de saída
+		saida2 = Arquivo de saída
+		saida3 = Arquivo de saída
+*/
 void csv2Bin(FILE *entrada, FILE *saida1, FILE *saida2, FILE *saida3) {
     char c = 'c'; // caracter que irá percorrer o arquivo, deve ser inicializado com um valor != de EOF
     int field;  // indica qual campo do arquivo está sendo lido, seus valores vão de 0 a 7
     int iField; // indica o inidice o campo que está sendo lido, seus valores vão de 0 a n
     Registro reg; // armazena um registro lido
 
-    // incializando variáveis
     // atribui null aos campos variáveis para fazer realloc deles
     anularCampos(&reg);
+
+    // inicializando variáveis
     field = 0;
     iField = 0;
 
-    // iterando sobre o arquivo
+    // iterando sobre o arquivo lendo caracter por caracter até
+    // alcançar fim de arquivo
     while(c != EOF) {
 
         // le um caracter do arquivo
@@ -37,7 +48,7 @@ void csv2Bin(FILE *entrada, FILE *saida1, FILE *saida2, FILE *saida3) {
         if (c == '\n') {
 
         	// verifica se todos os campos fixos tem o tamanho correto
-        	// certifica que entradas null tambem possui o tamanho fixo do campo
+        	// certifica que entradas null fiquem com o tamanho do campo fixo
         	checarTamanhoCampoFixo(&reg);
 
         	// grava o registro anterior
@@ -49,7 +60,7 @@ void csv2Bin(FILE *entrada, FILE *saida1, FILE *saida2, FILE *saida3) {
             field = 0;
             // zera indice do campo que será lido
             iField = 0;
-            //Prepara os campo para serem realocados
+            // prepara os campo para serem realocados
 			free(reg.razSoc);
 			free(reg.nomeFant);
 			free(reg.motCanc);
@@ -67,50 +78,52 @@ void csv2Bin(FILE *entrada, FILE *saida1, FILE *saida2, FILE *saida3) {
             continue;
         }
 
-        // adiciona o carácter lido no registro
+        // adiciona o carácter lido no registro, no campo atual
         addCharFieldTxt(&reg, c, field, iField++);
     }
 }
 
 /*	Descrição:
-		Função que verifica se os campos fixos tem o tamanho correto
-	Parêmetros:
-		reg = Registro a verificar o tamanho dos campos fixos*/
+		Função que verifica se os campos fixos tem o tamanho correto. Se não estiverem, são completados com 0.
+
+	Parâmetros:
+		reg = Registro contendo os campos a serem verificados
+*/
 void checarTamanhoCampoFixo(Registro *reg) {
 	int size,i;
 
-	//verifica o tamanho do campo cnpj
+	// verifica o tamanho do campo cnpj
 	if (strlen(reg->cnpj) < SIZE_CNPJ) {
 		size = strlen(reg->cnpj);
 		for(i=size; i<SIZE_CNPJ; i++) {
-			reg->cnpj[i] = '0'; //completa o campo com 0s
+			reg->cnpj[i] = '0'; // completa o campo com 0
 		}
 		reg->cnpj[i] = '\0';
 	}
 
-	//verifica o tamanho do campo data de registro
+	// verifica o tamanho do campo data de registro
 	if( strlen(reg->dtReg) < SIZE_DATA) {
 		size = strlen(reg->dtReg);
 		for(i=size; i<SIZE_DATA ;i++) {
-			reg->dtReg[i] = '0'; //completa o campo com 0s
+			reg->dtReg[i] = '0'; // completa o campo com 0
 		}
 		reg->dtReg[i] = '\0';
 	}
 
-	//verifica o tamanho do campo data de cancelamento
+	// verifica o tamanho do campo data de cancelamento
 	if( strlen(reg->dtCanc) < SIZE_DATA) {
 		size = strlen(reg->dtCanc);
 		for(i=size; i<SIZE_DATA ;i++) {
-			reg->dtCanc[i] = '0'; //completa o campo com 0s
+			reg->dtCanc[i] = '0'; // completa o campo com 0
 		}
 		reg->dtCanc[i] = '\0';
 	}
 
-	//verifica o tamanho do campo cnpj auditor
+	// verifica o tamanho do campo cnpj auditor
 	if( strlen(reg->cnpjAud) < SIZE_CNPJ) {
 		size = strlen(reg->cnpjAud);
 		for(i=size; i<SIZE_CNPJ ;i++) {
-			reg->cnpjAud[i] = '0'; //completa o campo com 0s
+			reg->cnpjAud[i] = '0'; // completa o campo com 0
 		}
 		reg->cnpjAud[i] = '\0';
 	}
@@ -118,11 +131,11 @@ void checarTamanhoCampoFixo(Registro *reg) {
 
 /*	Descrição:
 		Função que grava um registro no arquivo
-	Parêmetros:
+	Parâmetros:
 		reg = Registro que será gravado
-		file = Arquvio cujo registro será gravado */
+		file = Arquivo a ser gravado
+*/
 void salvarRegistro(Registro *reg, FILE *file) {
-	int sizeReg; // tamanho do registro que será gravado
 	char delReg = DEL_REG; // delimitador de registro
 
 	// grava todos os campos
@@ -132,17 +145,21 @@ void salvarRegistro(Registro *reg, FILE *file) {
 }
 
 /*	Descrição:
-		Dado um registro a função grava todos os seus campos no arquivo
-	Parêmetros:
-		reg = Registro que terá seus campos gravados
-		file = Arquvio cujos campos serão gravados */
+		Dado um registro a função grava todos os seus campos no arquivo, seguindo o modelo de organização híbrida.
+	Parâmetros:
+		reg = Registro que será gravado
+		file = Arquivo onde o registro será gravado
+*/
 void salvarCampo(Registro *reg, FILE *file) {
 	int sizeField; // tamanho da string que será salva
 	char delField = DEL_FIELD; // delimitador de campo
 
-	// Campos Fixos
+	/********************************************//**
+     *  Campos fixos
+     ***********************************************/
+
 	// CNPJ
-	sizeField = strlen(reg->cnpj);				  	  // calcula tamanho da string
+	sizeField = strlen(reg->cnpj); // calcula tamanho da string
 	fwrite(reg->cnpj, sizeof(char), sizeField, file); // frwite string
 	//if(org != 'I') fwrite(&delField, sizeof(char), 1, file);
 
@@ -161,8 +178,10 @@ void salvarCampo(Registro *reg, FILE *file) {
 	fwrite(reg->cnpjAud, sizeof(char), sizeField, file);
 	//if(org != 'I') fwrite(&delField, sizeof(char), 1, file);
 
+	/********************************************//**
+     *  Campos variáveis
+     ***********************************************/
 
-	// Campos Variaveis
 	// Nome Social
 	sizeField = strlen(reg->razSoc);
 	fwrite(reg->razSoc, sizeof(char), sizeField, file);
@@ -185,37 +204,39 @@ void salvarCampo(Registro *reg, FILE *file) {
 }
 //-----------------------------------------------------//
 
-
 //***************************************//
-//* FUNÇÕES PARA LISTAGEM DOS REGISTROS *//
+//*  FUNÇÕES PARA LISTAGEM DOS ARQUIVOS *//
 //***************************************//
 
 /*	Descrição:
-		Lista todos os registros de um arquivo estejam organizados por delimitadores
-	Parêmetros:
-		file = Arquivo que terá seus registros listados */
+		Lista todos os registros de um arquivo binário
+	Parâmetros:
+		file = Arquivo a ser lido
+*/
 void listarBinario(FILE *file) {
-	Registro reg; // registro que será listado
+	Registro reg; // registro que será lido
 	int field; // campo que está sendo lido (0 a 7)
 	int iField;	// indice do campo que está sendo lido
 	char c;	// carácter que irá percorrer todo o arquivo
-
 
 	// inicializando variáveis
 	field = 0;
 	iField = 0;
 	anularCampos(&reg);
 
-	do{
-		// Le campo de tamanho fixo
+    // leitura do arquivo até chegar em EOF
+	do {
+		// lê campos de tamanho fixo do
+		// arquivo para o registro Reg
 		fread(&reg.cnpj, sizeof(char), SIZE_CNPJ, file);
 		fread(&reg.dtReg, sizeof(char), SIZE_DATA, file);
 		fread(&reg.dtCanc, sizeof(char), SIZE_DATA, file);
 		fread(&reg.cnpjAud, sizeof(char), SIZE_CNPJ, file);
 
-		// Le campos de tamanho variavel
-		while(fread(&c,sizeof(char),1,file) == 1){
-			// registro novo
+		// lê campos de tamanho variavel
+		while(fread(&c,sizeof(char),1,file) == 1) {
+			// delimitador de registro encontrado
+			// resetar estrutura Reg para receber novo registro
 			if (c == DEL_REG) {
 				field = 0;
 				iField = 0;
@@ -231,16 +252,18 @@ void listarBinario(FILE *file) {
 
 			// campo novo
 			if (c == DEL_FIELD) {
-				field++;
+				field++; // avança para o próximo campo do registro
 				iField = 0;
 				continue;
 			}
 
 			// adiciona char ao campo
 			addCharFieldBin(&reg, c, field, iField++);
+            // iField é o índice da string (vetor de char)
+            // onde o novo caracter será inserido
 		}
 
-	}while (!feof(file));
+	} while (!feof(file));
 }
 
 //********************//
@@ -249,18 +272,18 @@ void listarBinario(FILE *file) {
 
 /*	Descrição:
 		Função que compara o campo CNPJ de um registro com um valor informado
-	Parêmetros:
-		reg = Registro cujo campo irá sofrer a comparação
+	Parâmetros:
+		reg = Registro cujo campo CNPJ irá sofrer a comparação
 		strBusca = Valor (string) que será comparado com o campo do registro dado
 	Retorno:
-		Retorna o resultado da comparação, 0 para valores iguais e 1 caso contrário */
+		Retorna o resultado da comparação, 0 para valores iguais e 1 caso contrário
+*/
 int compararCNPJ(Registro *reg, char *strBusca) {
-	int cmp = -1; // armazena o resultado da comparação
 	int i;
 
 	if (reg->cnpj != NULL)
-		for(i=0; i<SIZE_CNPJ; i++){
-			if(reg->cnpj[i] != strBusca[i]){
+		for(i=0; i<SIZE_CNPJ; i++) {
+			if(reg->cnpj[i] != strBusca[i]) {
 				return 1;
 			}
 		}
@@ -270,7 +293,7 @@ int compararCNPJ(Registro *reg, char *strBusca) {
 /*	Descrição:
 		Faz uma busca no arquivo, independente da sua organização
 		e de acordo com o campo e o valor informado
-	Parêmetros:
+	Parâmetros:
 		file = Arquivo que a busca será realizada
 		fieldBusca = Campo que a busca irá comparar com o valor informado
 		strBusca = Valor (string) de comparação da busca
@@ -281,35 +304,39 @@ int compararCNPJ(Registro *reg, char *strBusca) {
 /*	Descrição:
 		Faz uma busca no arquivo de acordo com o campo e valor informado,
 		necessáriamente os registros do arquivo devem ser organizados por um delimitador entre eles
-	Parêmetros:
+	Parâmetros:
 		file = Arquivo que a busca será realizada
 		fieldBusca = Campo que a busca irá comparar com o valor informado
 		strBusca = Valor (string) de comparação da busca
 	Retorno:
-		Retorna o registro caso ele seja encontrado, caso contrário retorna NULL */
+		Retorna o registro caso ele seja encontrado, caso contrário retorna NULL
+*/
 Registro* buscaCampoCNPJ(FILE *file, char *strBusca) {
 	char c; // carácter que irá percorrer todo o arquivo
 	Registro *reg; // registro que será retornado
 	int field; // campo variaveis que serao lidos (4 a 7)
 	int iField; // indice do campo que está sendo lido
 
-	// aloca e prepara o registro
+	// aloca e prepara um registro
 	reg = (Registro *) malloc(sizeof(Registro));
 	// inicializando variáveis
-	field = 4;
+	field = 4; // CNPJ
 	iField = 0;
 	anularCampos(reg);
 
-	do{
+	do {
 		fread(&reg->cnpj,sizeof(char),SIZE_CNPJ,file);
 		fread(&reg->dtReg,sizeof(char),SIZE_DATA,file);
 		fread(&reg->dtCanc,sizeof(char),SIZE_DATA,file);
 		fread(&reg->cnpjAud,sizeof(char),SIZE_CNPJ,file);
 
-		while(fread(&c,sizeof(char),1,file) == 1){
+		while(fread(&c,sizeof(char),1,file) == 1) {
 			// registro novo
 			if (c == DEL_REG) {
 
+                // após ter lido o registro e chegado ao
+                // delimitador, compara o CNPJ do registro
+                // lido com a string de busca
 				if (compararCNPJ(reg, strBusca) == 0)
 					return reg;
 
@@ -335,7 +362,7 @@ Registro* buscaCampoCNPJ(FILE *file, char *strBusca) {
 			addCharFieldBin(reg, c, field, iField++);
 		}
 
-	}while (!feof(file));
+	} while (!feof(file));
 
 	// não encontrou
 	free(reg->razSoc);
@@ -349,8 +376,9 @@ Registro* buscaCampoCNPJ(FILE *file, char *strBusca) {
 /*	Descrição:
 		Dado um registro esta função atribui NULL aos seus campos de tamanho variável.
 		É utilizada quando um registro é recém criado e seus campos variáveis irão passar por um realloc
-	Parêmetros:
-		reg = Registro que irá receber null em seus campos variáveis */
+	Parâmetros:
+		reg = Registro que irá receber null em seus campos variáveis
+*/
 void anularCampos(Registro *reg) {
     reg->razSoc  = NULL;
     reg->nomeFant = NULL;
@@ -362,11 +390,12 @@ void anularCampos(Registro *reg) {
 		Função utilizada para preencher os campos variáveis lendo o arquivo de entrada,
 		sua função é inserir um char em um campo,
 		dado o registro, o campo e sua posição no campo
-	Parêmetros:
+	Parâmetros:
 		reg = Registro que terá o campo com o char adicionado
 		c = Char que será adicionado
 		field = Indica qual campo terá o char adicionado (seus valores vão de 0 a 7)
-		iField = Indice que indica em qual posição do campo o char será inserido */
+		iField = Indice que indica em qual posição do campo o char será inserido
+*/
 void addCharFieldTxt(Registro *reg, char c, int field, int iField) {
     switch(field) {
         // CNPJ
@@ -395,7 +424,7 @@ void addCharFieldTxt(Registro *reg, char c, int field, int iField) {
             reg->dtReg[iField] = '\0';
         break;
 
-        // Data do Registro
+        // Data do Cancelamento
         case 4:
             reg->dtCanc[iField++] = c;
             reg->dtCanc[iField] = '\0';
@@ -428,7 +457,7 @@ void addCharFieldTxt(Registro *reg, char c, int field, int iField) {
 		Função utilizada para preencher os campos variáveis,
 		sua função é inserir um char em um campo dos possiveis variaveis,
 		dado o registro, o campo e sua posição no campo
-	Parêmetros:
+	Parâmetros:
 		reg = Registro que terá o campo com o char adicionado
 		c = Char que será adicionado
 		field = Indica qual campo terá o char adicionado (seus valores vão de 0 a 7)
@@ -468,7 +497,7 @@ void addCharFieldBin(Registro *reg, char c, int field, int iField) {
 
 /*	Descrição:
 		Exibe um registro na saída padrão.
-	Parêmetros:
+	Parâmetros:
 		reg = Registro que será exibido na saída padrão */
 void printRegistro(Registro *reg) {
 
@@ -479,7 +508,7 @@ void printRegistro(Registro *reg) {
 		printf("null\n");
 	}
 	else{
-		for(i=0; i<SIZE_CNPJ; i++){
+		for(i=0; i<SIZE_CNPJ; i++) {
 			printf("%c",reg->cnpj[i]);
 		}
 		printf("\n");
@@ -492,8 +521,8 @@ void printRegistro(Registro *reg) {
 	if(reg->dtReg[0] == 'n') {
 		printf("null\n");
 	}
-	else{
-		for(i=0; i<SIZE_DATA; i++){
+	else {
+		for(i=0; i<SIZE_DATA; i++) {
 			printf("%c",reg->dtReg[i]);
 		}
 		printf("\n");
@@ -504,7 +533,7 @@ void printRegistro(Registro *reg) {
 		printf("null\n");
 	}
 	else{
-		for(i=0; i<SIZE_DATA; i++){
+		for(i=0; i<SIZE_DATA; i++) {
 			printf("%c", reg->dtCanc[i]);
 		}
 		printf("\n");
@@ -518,7 +547,7 @@ void printRegistro(Registro *reg) {
 		printf("null\n\n");
 	}
 	else{
-		for(i=0;i<SIZE_CNPJ;i++){
+		for(i=0;i<SIZE_CNPJ;i++) {
 			printf("%c", reg->cnpjAud[i]);
 		}
 		printf("\n\n");
