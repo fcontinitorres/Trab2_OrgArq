@@ -63,14 +63,17 @@ int main() {
 
 			case 3:
 				// TODO - inserção de registro
+				opcao3();
 				break;
 
 			case 4:
 				// TODO - estatísticas índices
+				opcao4();
 				break;
 
 			case 5:
 				// TODO - estatísticas remoções
+				opcao5();
 				break;
 
 			case 6:

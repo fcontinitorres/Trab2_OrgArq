@@ -18,6 +18,9 @@ Bruno Henrique Rasteiro, 9292910
 
 void opcao1(FILE *file);
 void opcao2(FILE *file);
+void opcao3();
+void opcao4();
+void opcao5();
 int validaArquivos(FILE **entrada, FILE **saida1, FILE **saida2, FILE **saida3);
 
 #endif
