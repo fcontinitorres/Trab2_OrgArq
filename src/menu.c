@@ -11,38 +11,38 @@ Bruno Henrique Rasteiro, 9292910
 /*	Descrição:
 		Abre os arquivos de entrada e saída do programa
 	Parêmetros:
-		fileIn = arquivo de entrada
-		fileOut1 = arquivo de saída
-		fileOut2 = arquivo de saída
-		fileOut3 = arquivo de saída
+		entrada = arquivo de entrada
+		saida1 = arquivo de saída
+		saida2 = arquivo de saída
+		saida3 = arquivo de saída
 	Retorno:
 		Retorna um int que indica o sucesso da função. Os possíves valores são:
 		1 -> Arquivos aberto com sucesso
 		2 -> Falha ao abrir arquivos */
-int validaArquivos(FILE **fileIn, FILE **fileOut1, FILE **fileOut2, FILE **fileOut3) {
+int validaArquivos(FILE **entrada, FILE **saida1, FILE **saida2, FILE **saida3) {
 
 	// abrindo arquivos
-    *fileIn  = fopen(FILE_IN, "r");
-    *fileOut1 = fopen(FILE_OUT1, "wb+");
-    *fileOut2 = fopen(FILE_OUT2, "wb+");
-    *fileOut3 = fopen(FILE_OUT3, "wb+");
+    *entrada  = fopen(FILE_IN, "r");
+    *saida1 = fopen(FILE_OUT1, "wb+");
+    *saida2 = fopen(FILE_OUT2, "wb+");
+    *saida3 = fopen(FILE_OUT3, "wb+");
 
-    if (*fileIn == NULL) {
+    if (*entrada == NULL) {
     	printf("Erro ao abrir: %s\n", FILE_IN);
     	return(0);
     }
 
-    if (*fileOut1 == NULL) {
+    if (*saida1 == NULL) {
     	printf("Erro ao abrir: %s\n", FILE_OUT1);
     	return(0);
     }
 
-    if (*fileOut2 == NULL) {
+    if (*saida2 == NULL) {
     	printf("Erro ao abrir: %s\n", FILE_OUT2);
     	return(0);
     }
 
-    if (*fileOut3 == NULL) {
+    if (*saida3 == NULL) {
     	printf("Erro ao abrir: %s\n", FILE_OUT3);
     	return(0);
     }
@@ -56,7 +56,7 @@ int validaArquivos(FILE **fileIn, FILE **fileOut1, FILE **fileOut2, FILE **fileO
 		file = arquivo de saida (binário) */
 void opcao1(FILE *file) {
 	// lista todos os dados
-	listBin(file);
+	listarBinario(file);
 
 	// reseta ponteiro do arquivo
 	fseek(file, 0, SEEK_SET);
@@ -80,7 +80,7 @@ void opcao2(FILE *file) {
 
 	if (reg != NULL) {
 		printf("Registro Localizado\n");
-		printReg(reg);
+		printRegistro(reg);
 		free(reg->razSoc);
 		free(reg->nomeFant);
 		free(reg->motCanc);

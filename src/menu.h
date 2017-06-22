@@ -18,6 +18,6 @@ Bruno Henrique Rasteiro, 9292910
 
 void opcao1(FILE *file);
 void opcao2(FILE *file);
-int validaArquivos(FILE **fileIn, FILE **fileOut1, FILE **fileOut2, FILE **fileOut3);
+int validaArquivos(FILE **entrada, FILE **saida1, FILE **saida2, FILE **saida3);
 
 #endif

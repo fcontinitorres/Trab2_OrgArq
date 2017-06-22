@@ -37,15 +37,15 @@ typedef struct registro {
 //*****************************************************//
 //* FUNÇÕES PARA GERAR O ARQUIVO BINÁRIO DE REGISTROS *//
 //*****************************************************//
-void checkSizeFixedFields(Registro *reg);
+void checarTamanhoCampoFixo(Registro *reg);
 
-void csv2Bin(FILE *fileIn, FILE *file1, FILE *file2, FILE *file3);
+void csv2Bin(FILE *entrada, FILE *file1, FILE *file2, FILE *file3);
 
-void saveField(Registro *reg, FILE *file);
+void salvarCampo(Registro *reg, FILE *file);
 
-void saveReg(Registro *reg, FILE *file);
+void salvarRegistro(Registro *reg, FILE *file);
 
-void nullFields(Registro *reg);
+void anularCampos(Registro *reg);
 
 void addCharFieldTxt(Registro *reg, char c, int field, int iField);
 
@@ -55,9 +55,9 @@ void addCharFieldBin(Registro *reg, char c, int field, int iField);
 //***************************************//
 //* FUNÇÃO PARA LISTAGEM DOS REGISTROS *//
 //***************************************//
-void listBin(FILE *file);
+void listarBinario(FILE *file);
 
-void printReg(Registro *reg);
+void printRegistro(Registro *reg);
 //---------------------------------------//
 
 //********************//
@@ -65,7 +65,7 @@ void printReg(Registro *reg);
 //********************//
 Registro* buscaCampoCNPJ(FILE *file, char *strBusca);
 
-int compareFieldCNPJ(Registro *reg, char *strBusca);
+int compararCNPJ(Registro *reg, char *strBusca);
 //--------------------//
 
 #endif

@@ -7,11 +7,11 @@
 /*	Descrição:
 		Lê os dados em um arquivo de entrada e os salva de forma organizada em um arquivo de saída
 	Parêmetros:
-		fileIn = Arquivo de entrada
-		fileOut1 = Arquvio de saída
-		fileOut2 = Arquvio de saída
-		fileOut3 = Arquvio de saída */
-void csv2Bin(FILE *fileIn, FILE *fileOut1, FILE *fileOut2, FILE *fileOut3) {
+		entrada = Arquivo de entrada
+		saida1 = Arquvio de saída
+		saida2 = Arquvio de saída
+		saida3 = Arquvio de saída */
+void csv2Bin(FILE *entrada, FILE *saida1, FILE *saida2, FILE *saida3) {
     char c = 'c'; // caracter que irá percorrer o arquivo, deve ser inicializado com um valor != de EOF
     int field;  // indica qual campo do arquivo está sendo lido, seus valores vão de 0 a 7
     int iField; // indica o inidice o campo que está sendo lido, seus valores vão de 0 a n
@@ -19,7 +19,7 @@ void csv2Bin(FILE *fileIn, FILE *fileOut1, FILE *fileOut2, FILE *fileOut3) {
 
     // incializando variáveis
     // atribui null aos campos variáveis para fazer realloc deles
-    nullFields(&reg);
+    anularCampos(&reg);
     field = 0;
     iField = 0;
 
@@ -27,7 +27,7 @@ void csv2Bin(FILE *fileIn, FILE *fileOut1, FILE *fileOut2, FILE *fileOut3) {
     while(c != EOF) {
 
         // le um caracter do arquivo
-        c = fgetc(fileIn);
+        c = fgetc(entrada);
 
         // caracter de nova linha, deve ser ignorado na leitura
         if (c == '\r')
@@ -38,12 +38,12 @@ void csv2Bin(FILE *fileIn, FILE *fileOut1, FILE *fileOut2, FILE *fileOut3) {
 
         	// verifica se todos os campos fixos tem o tamanho correto
         	// certifica que entradas null tambem possui o tamanho fixo do campo
-        	checkSizeFixedFields(&reg);
+        	checarTamanhoCampoFixo(&reg);
 
         	// grava o registro anterior
-	        saveReg(&reg, fileOut1);
-	        saveReg(&reg, fileOut2);
-	        saveReg(&reg, fileOut3);
+	        salvarRegistro(&reg, saida1);
+	        salvarRegistro(&reg, saida2);
+	        salvarRegistro(&reg, saida3);
 
 	        // zera indicador do campo que será lido
             field = 0;
@@ -54,7 +54,7 @@ void csv2Bin(FILE *fileIn, FILE *fileOut1, FILE *fileOut2, FILE *fileOut3) {
 			free(reg.nomeFant);
 			free(reg.motCanc);
 			free(reg.nomeEmp);
-            nullFields(&reg);
+            anularCampos(&reg);
             continue;
         }
 
@@ -76,7 +76,7 @@ void csv2Bin(FILE *fileIn, FILE *fileOut1, FILE *fileOut2, FILE *fileOut3) {
 		Função que verifica se os campos fixos tem o tamanho correto
 	Parêmetros:
 		reg = Registro a verificar o tamanho dos campos fixos*/
-void checkSizeFixedFields(Registro *reg) {
+void checarTamanhoCampoFixo(Registro *reg) {
 	int size,i;
 
 	//verifica o tamanho do campo cnpj
@@ -121,12 +121,12 @@ void checkSizeFixedFields(Registro *reg) {
 	Parêmetros:
 		reg = Registro que será gravado
 		file = Arquvio cujo registro será gravado */
-void saveReg(Registro *reg, FILE *file) {
+void salvarRegistro(Registro *reg, FILE *file) {
 	int sizeReg; // tamanho do registro que será gravado
 	char delReg = DEL_REG; // delimitador de registro
 
 	// grava todos os campos
-	saveField(reg, file);
+	salvarCampo(reg, file);
 	// grava o delimitador de registros
 	fwrite(&delReg, sizeof(char), 1, file);
 }
@@ -136,7 +136,7 @@ void saveReg(Registro *reg, FILE *file) {
 	Parêmetros:
 		reg = Registro que terá seus campos gravados
 		file = Arquvio cujos campos serão gravados */
-void saveField(Registro *reg, FILE *file) {
+void salvarCampo(Registro *reg, FILE *file) {
 	int sizeField; // tamanho da string que será salva
 	char delField = DEL_FIELD; // delimitador de campo
 
@@ -194,7 +194,7 @@ void saveField(Registro *reg, FILE *file) {
 		Lista todos os registros de um arquivo estejam organizados por delimitadores
 	Parêmetros:
 		file = Arquivo que terá seus registros listados */
-void listBin(FILE *file) {
+void listarBinario(FILE *file) {
 	Registro reg; // registro que será listado
 	int field; // campo que está sendo lido (0 a 7)
 	int iField;	// indice do campo que está sendo lido
@@ -204,7 +204,7 @@ void listBin(FILE *file) {
 	// inicializando variáveis
 	field = 0;
 	iField = 0;
-	nullFields(&reg);
+	anularCampos(&reg);
 
 	do{
 		// Le campo de tamanho fixo
@@ -219,13 +219,13 @@ void listBin(FILE *file) {
 			if (c == DEL_REG) {
 				field = 0;
 				iField = 0;
-				printReg(&reg);
+				printRegistro(&reg);
 				free(reg.razSoc);
 				free(reg.nomeFant);
 				free(reg.motCanc);
 				free(reg.nomeEmp);
 
-				nullFields(&reg);
+				anularCampos(&reg);
 				break;
 			}
 
@@ -254,7 +254,7 @@ void listBin(FILE *file) {
 		strBusca = Valor (string) que será comparado com o campo do registro dado
 	Retorno:
 		Retorna o resultado da comparação, 0 para valores iguais e 1 caso contrário */
-int compareFieldCNPJ(Registro *reg, char *strBusca) {
+int compararCNPJ(Registro *reg, char *strBusca) {
 	int cmp = -1; // armazena o resultado da comparação
 	int i;
 
@@ -298,7 +298,7 @@ Registro* buscaCampoCNPJ(FILE *file, char *strBusca) {
 	// inicializando variáveis
 	field = 4;
 	iField = 0;
-	nullFields(reg);
+	anularCampos(reg);
 
 	do{
 		fread(&reg->cnpj,sizeof(char),SIZE_CNPJ,file);
@@ -310,7 +310,7 @@ Registro* buscaCampoCNPJ(FILE *file, char *strBusca) {
 			// registro novo
 			if (c == DEL_REG) {
 
-				if (compareFieldCNPJ(reg, strBusca) == 0)
+				if (compararCNPJ(reg, strBusca) == 0)
 					return reg;
 
 				field = 4;
@@ -320,7 +320,7 @@ Registro* buscaCampoCNPJ(FILE *file, char *strBusca) {
 				free(reg->motCanc);
 				free(reg->nomeEmp);
 
-				nullFields(reg);
+				anularCampos(reg);
 				break;
 			}
 
@@ -351,7 +351,7 @@ Registro* buscaCampoCNPJ(FILE *file, char *strBusca) {
 		É utilizada quando um registro é recém criado e seus campos variáveis irão passar por um realloc
 	Parêmetros:
 		reg = Registro que irá receber null em seus campos variáveis */
-void nullFields(Registro *reg) {
+void anularCampos(Registro *reg) {
     reg->razSoc  = NULL;
     reg->nomeFant = NULL;
     reg->motCanc  = NULL;
@@ -470,7 +470,7 @@ void addCharFieldBin(Registro *reg, char c, int field, int iField) {
 		Exibe um registro na saída padrão.
 	Parêmetros:
 		reg = Registro que será exibido na saída padrão */
-void printReg(Registro *reg) {
+void printRegistro(Registro *reg) {
 
 	int i;
 

@@ -10,56 +10,73 @@ Bruno Henrique Rasteiro, 9292910
 #include "menu.h"
 
 int main() {
+
 	int flag;
 	int opcao;
-	FILE *fileIn, *fileOut1, *fileOut2, *fileOut3;
+	FILE *entrada, *saida1, *saida2, *saida3;
 
 	// verifica se os arquivos foram abertos com sucesso
-	if (!validaArquivos(&fileIn, &fileOut1, &fileOut2, &fileOut3)) {
+	if (!validaArquivos(&entrada, &saida1, &saida2, &saida3)) {
 		return(0);
 	}
 
 	printf("\n++++++++++++++++++++++++++++++++++++++++\n");
 	printf("+ TRABALHO 2 - ORGANIZAÇÃO DE ARQUIVOS +\n");
 	printf("++++++++++++++++++++++++++++++++++++++++\n");
-	printf("Organizando Arquivos com Delimitadores entre registros\n");
 
 	// gera arquivos de saida (binario)
-	csv2Bin(fileIn, fileOut1, fileOut2, fileOut3);
+	csv2Bin(entrada, saida1, saida2, saida3);
 
 	// fechando arquivo de entrada
-	fclose(fileIn);
+	fclose(entrada);
 
 	// reseta ponteiro dos arquivos binarios
-	fseek(fileOut1, 0, SEEK_SET);
-	fseek(fileOut2, 0, SEEK_SET);
-	fseek(fileOut3, 0, SEEK_SET);
+	fseek(saida1, 0, SEEK_SET);
+	fseek(saida2, 0, SEEK_SET);
+	fseek(saida3, 0, SEEK_SET);
 
+	// interface
 	flag = 1;
 	while(flag) {
 
-    	printf("\n++++++++\n");
-    	printf("+ MENU +\n");
-    	printf("++++++++\n");
+    	printf("\n++++++++++++++++++++++++++++++++++++++++\n");
+		printf("+                 MENU                 +\n");
+		printf("++++++++++++++++++++++++++++++++++++++++\n");
     	printf("1 - Listar todos os registros\n");
-		printf("2 - Buscar um registro pelo CNPJ\n");
-		printf("3 - Sair\n");
+		printf("2 - Remover registro pelo CNPJ\n");
+		printf("3 - Inserir registro adicional\n");
+		printf("4 - Estatísticas sobre arquivos de índice\n");
+		printf("5 - Estatísticas sobre os registros removidos\n");
+		printf("6 - Sair\n");
 		printf("Escolha uma opção: ");
 		scanf("%d", &opcao);
 		getchar();
 
 		switch(opcao) {
 			case 1:
-				opcao1(fileOut1);
-			break;
+				opcao1(saida1);
+				break;
 
 			case 2:
-				opcao2(fileOut1);
-			break;
+				opcao2(saida1);
+				break;
 
 			case 3:
+				// TODO - inserção de registro
+				break;
+
+			case 4:
+				// TODO - estatísticas índices
+				break;
+
+			case 5:
+				// TODO - estatísticas remoções
+				break;
+
+			case 6:
+				printf("Saindo\n");
 				flag = 0;
-			break;
+				break;
 
 			default:
 				printf("\nOpcao invalida.\n");
@@ -67,7 +84,7 @@ int main() {
 	}
 
 	// fechando arquivos
-	fclose(fileOut1);
-	fclose(fileOut2);
-	fclose(fileOut3);
+	fclose(saida1);
+	fclose(saida2);
+	fclose(saida3);
 }
