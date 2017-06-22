@@ -18,7 +18,7 @@ Bruno Henrique Rasteiro, 9292910
 	Retorno:
 		Retorna um int que indica o sucesso da função. Os possíves valores são:
 		1 -> Arquivos aberto com sucesso
-		2 -> Falha ao abrir arquivos
+		EXIT_FAILURE -> Falha ao abrir arquivos
 */
 int validaArquivos(FILE **entrada, FILE **saida1, FILE **saida2, FILE **saida3) {
 
