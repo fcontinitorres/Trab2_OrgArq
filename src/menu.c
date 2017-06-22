@@ -94,3 +94,15 @@ void opcao2(FILE *file) {
 	free(reg);
 	free(strBusca);
 }
+
+void opcao3() {
+
+}
+
+void opcao4() {
+
+}
+
+void opcao5() {
+
+}
