@@ -6,6 +6,12 @@ Júlia Diniz Ferreira, 9364865
 Bruno Henrique Rasteiro, 9292910
 */
 
+/********************************************//**
+ *  Variáveis globais
+ *  Caminhos de arquivos
+ *  Definições de tamanhos e delimitadores
+ ***********************************************/
+
 // tamanho dos campos fixos
 #define SIZE_CNPJ 18
 #define SIZE_DATA 8

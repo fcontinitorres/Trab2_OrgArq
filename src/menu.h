@@ -14,7 +14,7 @@ Bruno Henrique Rasteiro, 9292910
 #define MENU_H
 
 #include <stdio.h>
-#include "funcoes.h"
+#include "registro.h"
 
 void opcao1(FILE *file);
 void opcao2(FILE *file);

@@ -6,8 +6,8 @@ Júlia Diniz Ferreira, 9364865
 Bruno Henrique Rasteiro, 9292910
 */
 
-#include "../src/funcoes.h"
-#include "../src/parametros.h"
+#include "registro.h"
+#include "menu.h"
 
 int main() {
 	int flag;

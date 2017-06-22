@@ -1,104 +1,4 @@
-/*
-GRUPO G5
-Felipe Scrochio Custodio, 9442688
-Felipe Contini Torres, 9253670
-Júlia Diniz Ferreira, 9364865
-Bruno Henrique Rasteiro, 9292910
-*/
-
-#include "../src/funcoes.h"
-
-//*******************//
-//* FUNÇÕES DO MAIN *//
-//*******************//
-
-/*	Descrição:
-		Abre os arquivos de entrada e saída do programa
-	Parêmetros:
-		fileIn = arquivo de entrada
-		fileOut1 = arquivo de saída
-		fileOut2 = arquivo de saída
-		fileOut3 = arquivo de saída
-	Retorno:
-		Retorna um int que indica o sucesso da função. Os possíves valores são:
-		1 -> Arquivos aberto com sucesso
-		2 -> Falha ao abrir arquivos */
-int validaArquivos(FILE **fileIn, FILE **fileOut1, FILE **fileOut2, FILE **fileOut3) {
-
-	// abrindo arquivos
-    *fileIn  = fopen(FILE_IN, "r");
-    *fileOut1 = fopen(FILE_OUT1, "wb+");
-    *fileOut2 = fopen(FILE_OUT2, "wb+");
-    *fileOut3 = fopen(FILE_OUT3, "wb+");
-
-    if (*fileIn == NULL) {
-    	printf("Erro ao abrir: %s\n", FILE_IN);
-    	return(0);
-    }
-
-    if (*fileOut1 == NULL) {
-    	printf("Erro ao abrir: %s\n", FILE_OUT1);
-    	return(0);
-    }
-
-    if (*fileOut2 == NULL) {
-    	printf("Erro ao abrir: %s\n", FILE_OUT2);
-    	return(0);
-    }
-
-    if (*fileOut3 == NULL) {
-    	printf("Erro ao abrir: %s\n", FILE_OUT3);
-    	return(0);
-    }
-
-    return(1);
-}
-
-/*	Descrição:
-		Realiza as tarefas para executar a primeira opção do menu
-	Parêmetros:
-		file = arquivo de saida (binário) */
-void opcao1(FILE *file) {
-	// lista todos os dados
-	listBin(file);
-
-	// reseta ponteiro do arquivo
-	fseek(file, 0, SEEK_SET);
-}
-
-/*	Descrição:
-		Realiza as tarefas para executar a segunda opção do menu
-	Parêmetros:
-		file = arquivo de saida (binário) */
-void opcao2(FILE *file) {
-	char *strBusca; // valor que a busca irá usar para comparar
-	Registro *reg; // registro resultante da busca
-
-	// espera o valor da busca
-	printf("Informe o cnpj a ser buscado: ");
-	strBusca = NULL;
-	scanf("%ms", &strBusca);
-
-	// busca
-	reg = buscaCampoCNPJ(file, strBusca);
-
-	if (reg != NULL) {
-		printf("Registro Localizado\n");
-		printReg(reg);
-		free(reg->razSoc);
-		free(reg->nomeFant);
-		free(reg->motCanc);
-		free(reg->nomeEmp);
-	}
-	else
-		printf("Não foi possível localizar o registro.\n");
-
-	// reseta ponteiro do arquivo
-	fseek(file, 0, SEEK_SET);
-	free(reg);
-	free(strBusca);
-}
-
+#include "registro.h"
 
 //************************************************//
 //* FUNÇÕES PARA GERAR OS ARQUIVOS BINÁRIOS      *//
@@ -180,7 +80,7 @@ void checkSizeFixedFields(Registro *reg) {
 	int size,i;
 
 	//verifica o tamanho do campo cnpj
-	if( strlen(reg->cnpj) < SIZE_CNPJ ) {
+	if (strlen(reg->cnpj) < SIZE_CNPJ) {
 		size = strlen(reg->cnpj);
 		for(i=size; i<SIZE_CNPJ; i++) {
 			reg->cnpj[i] = '0'; //completa o campo com 0s
@@ -285,6 +185,7 @@ void saveField(Registro *reg, FILE *file) {
 }
 //-----------------------------------------------------//
 
+
 //***************************************//
 //* FUNÇÕES PARA LISTAGEM DOS REGISTROS *//
 //***************************************//
@@ -315,7 +216,7 @@ void listBin(FILE *file) {
 		// Le campos de tamanho variavel
 		while(fread(&c,sizeof(char),1,file) == 1){
 			// registro novo
-			if (c == DEL_REG) {	
+			if (c == DEL_REG) {
 				field = 0;
 				iField = 0;
 				printReg(&reg);
@@ -345,6 +246,26 @@ void listBin(FILE *file) {
 //********************//
 //* FUNÇÕES DE BUSCA *//
 //********************//
+
+/*	Descrição:
+		Função que compara o campo CNPJ de um registro com um valor informado
+	Parêmetros:
+		reg = Registro cujo campo irá sofrer a comparação
+		strBusca = Valor (string) que será comparado com o campo do registro dado
+	Retorno:
+		Retorna o resultado da comparação, 0 para valores iguais e 1 caso contrário */
+int compareFieldCNPJ(Registro *reg, char *strBusca) {
+	int cmp = -1; // armazena o resultado da comparação
+	int i;
+
+	if (reg->cnpj != NULL)
+		for(i=0; i<SIZE_CNPJ; i++){
+			if(reg->cnpj[i] != strBusca[i]){
+				return 1;
+			}
+		}
+	return 0;
+}
 
 /*	Descrição:
 		Faz uma busca no arquivo, independente da sua organização
@@ -388,7 +309,7 @@ Registro* buscaCampoCNPJ(FILE *file, char *strBusca) {
 		while(fread(&c,sizeof(char),1,file) == 1){
 			// registro novo
 			if (c == DEL_REG) {
-				
+
 				if (compareFieldCNPJ(reg, strBusca) == 0)
 					return reg;
 
@@ -425,9 +346,17 @@ Registro* buscaCampoCNPJ(FILE *file, char *strBusca) {
 	return NULL;
 }
 
-//*******************************//
-//* FUNÇÕES ÚTEIS (SUB FUNÇÕES) *//
-//*******************************//
+/*	Descrição:
+		Dado um registro esta função atribui NULL aos seus campos de tamanho variável.
+		É utilizada quando um registro é recém criado e seus campos variáveis irão passar por um realloc
+	Parêmetros:
+		reg = Registro que irá receber null em seus campos variáveis */
+void nullFields(Registro *reg) {
+    reg->razSoc  = NULL;
+    reg->nomeFant = NULL;
+    reg->motCanc  = NULL;
+    reg->nomeEmp  = NULL;
+}
 
 /*	Descrição:
 		Função utilizada para preencher os campos variáveis lendo o arquivo de entrada,
@@ -538,18 +467,6 @@ void addCharFieldBin(Registro *reg, char c, int field, int iField) {
 }
 
 /*	Descrição:
-		Dado um registro esta função atribui NULL aos seus campos de tamanho variável.
-		É utilizada quando um registro é recém criado e seus campos variáveis irão passar por um realloc
-	Parêmetros:
-		reg = Registro que irá receber null em seus campos variáveis */
-void nullFields(Registro *reg) {
-    reg->razSoc  = NULL;
-    reg->nomeFant = NULL;
-    reg->motCanc  = NULL;
-    reg->nomeEmp  = NULL;
-}
-
-/*	Descrição:
 		Exibe um registro na saída padrão.
 	Parêmetros:
 		reg = Registro que será exibido na saída padrão */
@@ -607,24 +524,3 @@ void printReg(Registro *reg) {
 		printf("\n\n");
 	}
 }
-
-/*	Descrição:
-		Função que compara o campo CNPJ de um registro com um valor informado
-	Parêmetros:
-		reg = Registro cujo campo irá sofrer a comparação
-		strBusca = Valor (string) que será comparado com o campo do registro dado
-	Retorno:
-		Retorna o resultado da comparação, 0 para valores iguais e 1 caso contrário */
-int compareFieldCNPJ(Registro *reg, char *strBusca) {
-	int cmp = -1; // armazena o resultado da comparação
-	int i;
-
-	if (reg->cnpj != NULL)
-		for(i=0; i<SIZE_CNPJ; i++){
-			if(reg->cnpj[i] != strBusca[i]){
-				return 1;
-			}
-		}
-	return 0;
-}
-//----------------------------//
