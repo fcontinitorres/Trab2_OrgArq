@@ -29,3 +29,6 @@ Bruno Henrique Rasteiro, 9292910
 #define FILE_OUT1 "out/saida1.bin"
 #define FILE_OUT2 "out/saida2.bin"
 #define FILE_OUT3 "out/saida3.bin"
+#define FILE_IND1 "out/indice1.bin"
+#define FILE_IND2 "out/indice2.bin"
+#define FILE_IND3 "out/indice3.bin"

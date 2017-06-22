@@ -291,17 +291,6 @@ int compararCNPJ(Registro *reg, char *strBusca) {
 }
 
 /*	Descrição:
-		Faz uma busca no arquivo, independente da sua organização
-		e de acordo com o campo e o valor informado
-	Parâmetros:
-		file = Arquivo que a busca será realizada
-		fieldBusca = Campo que a busca irá comparar com o valor informado
-		strBusca = Valor (string) de comparação da busca
-	Retorno:
-		Retorna o registro caso ele seja encontrado, caso contrário retorna NULL */
-
-
-/*	Descrição:
 		Faz uma busca no arquivo de acordo com o campo e valor informado,
 		necessáriamente os registros do arquivo devem ser organizados por um delimitador entre eles
 	Parâmetros:
@@ -451,7 +440,6 @@ void addCharFieldTxt(Registro *reg, char c, int field, int iField) {
         break;
     }
 }
-
 
 /*	Descrição:
 		Função utilizada para preencher os campos variáveis,

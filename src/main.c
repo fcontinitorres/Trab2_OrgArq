@@ -18,9 +18,9 @@ int main() {
 	FILE *entrada, *saida1, *saida2, *saida3; // arquivos de dados
 	FILE *indice1, *indice2, *indice3; // arquivos de índice primário
 
-	// verifica se os arquivos foram abertos com sucesso
+	// abre e verifica se os arquivos foram abertos com sucesso
 	if (!validaArquivos(&entrada, &saida1, &saida2, &saida3)) {
-		printf("ERRO AO ABRIR ARQUIVOS\n");
+		printf("\nERRO AO ABRIR ARQUIVOS\n");
 		return EXIT_FAILURE;
 	}
 
@@ -32,7 +32,7 @@ int main() {
 	csv2Bin(entrada, saida1, saida2, saida3);
 
 	// gerar arquivos de índice primário
-	
+
 
 	// fechando arquivo de entrada
 	fclose(entrada);

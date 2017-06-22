@@ -16,11 +16,34 @@ Bruno Henrique Rasteiro, 9292910
         * dados obtidos a partir da leitura do csv
         * FILE* indice_primario = arquivo de índice primário a ser gerado
 */
-void criar_indice(FILE *saida, FILE *indice_primario) {
+void criar_indices(FILE *saida, FILE *ind1, FILE* ind2, FILE* ind3) {
 
+    int byte_offset = 0;
+    char c = 'c';
+
+    // inicializa nó de índice para ser gravado em arquivo
     NODE* indice = (NODE*)malloc(sizeof(NODE));
 
+    // abre e valida arquivos de índice
+    ind1 = fopen(FILE_IND1, "wb+");
+    if (!ind1) {
+        printf("Erro ao abrir %s\n", FILE_IND1);
+    }
+
+    ind2 = fopen(FILE_IND2, "wb+");
+    if (!ind2) {
+        printf("Erro ao abrir %s\n", FILE_IND2);
+    }
+
+    ind3 = fopen(FILE_IND3, "wb+");
+    if (!ind3) {
+        printf("Erro ao abrir %s\n", FILE_IND3);
+    }
+
     // percorrer arquivo binário
+    do {
+
+    } while();
 
 
     // gravar índice primário em arquivo
