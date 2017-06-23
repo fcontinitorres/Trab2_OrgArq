@@ -8,6 +8,7 @@ Bruno Henrique Rasteiro, 9292910
 
 #include <locale.h>
 #include "registro.h"
+#include "indice.h"
 #include "menu.h"
 
 int main() {
@@ -31,16 +32,16 @@ int main() {
 	// gera arquivos de saida (binario)
 	csv2Bin(entrada, saida1, saida2, saida3);
 
-	// gerar arquivos de índice primário
-
-
-	// fechando arquivo de entrada
-	fclose(entrada);
-
 	// reseta ponteiro dos arquivos binarios
 	fseek(saida1, 0, SEEK_SET);
 	fseek(saida2, 0, SEEK_SET);
 	fseek(saida3, 0, SEEK_SET);
+
+	// gerar arquivos de índice primário
+	criar_indices(saida1, indice1, indice2, indice3);
+
+	// fechando arquivo de entrada
+	fclose(entrada);
 
 	// interface
 	flag = 1;

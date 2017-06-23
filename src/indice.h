@@ -16,24 +16,17 @@ Bruno Henrique Rasteiro, 9292910
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "registro.h"
 
-typedef struct node NODE;
-
-struct node {
-
-    char chave[19]; // chave de busca (CNPJ)
-    char referencia[4]; // chave de referencia (byte offset)
-
-};
-
 void pesquisa_indice_chave(FILE*, char*); // busca por chave
 void pesquisa_indice_ref(FILE*, char*); // busca por referência
-void criar_indices(FILE*, FILE*, FILE*, FILE*); // alocar estruturas e gerar arquivos de índice
+int criar_indices(FILE* saida, FILE* ind1, FILE* ind2, FILE* ind3); // alocar estruturas e gerar arquivos de índice
 void inserir_indice(); // inserir novo item no índice
 void remover_indice(); // remover item do índice
 void atualizar_indice(FILE*); // reordenar
 void destruir_indice(FILE*); // desalocar
+char* int2string(int val, int base); // transforma int em string
 
 #endif
