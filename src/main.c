@@ -38,7 +38,10 @@ int main() {
 	fseek(saida3, 0, SEEK_SET);
 
 	// gerar arquivos de índice primário
-	criar_indices(saida1, indice1, indice2, indice3);
+	if (!(criar_indices(saida1, indice1, indice2, indice3))) {
+		printf("Erro ao gerar arquivos de índices\n");
+		return EXIT_FAILURE;
+	}
 
 	// fechando arquivo de entrada
 	fclose(entrada);

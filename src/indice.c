@@ -8,6 +8,10 @@ Bruno Henrique Rasteiro, 9292910
 
 #include "indice.h"
 
+/********************************************//**
+ *  Funções para criação e manipulação de índices
+ ***********************************************/
+
 /*
     Descrição:
 		* Gera arquivo de índice primário baseado nos registros do arquivo 'saida', gravando no arquivo 'indice_primario'
@@ -18,9 +22,17 @@ Bruno Henrique Rasteiro, 9292910
 */
 int criar_indices(FILE *saida, FILE *ind1, FILE* ind2, FILE* ind3) {
 
+    int i;
+    // inicializar registro
     Registro* reg; // registro a ser lido
+    reg = (Registro *)malloc(sizeof(Registro));
     int byte_offset = 0; // byte offset atual
     char c = 'c'; // caracter para percorrer arquivo
+
+    // inicializar índice
+    INDICE* indice = (INDICE*)malloc(sizeof(INDICE));
+    indice->lista = (NO**)malloc(sizeof(NO**));
+    indice->tamanho = 0;
 
     // abre e valida arquivos de índice
     ind1 = fopen(FILE_IND1, "wb+");
@@ -44,25 +56,30 @@ int criar_indices(FILE *saida, FILE *ind1, FILE* ind2, FILE* ind3) {
     // percorrer arquivo binário
     do {
 
-        // descobre o byte offset atual
+        // armazena o byte offset atual
         byte_offset = ftell(saida);
 
         // preparar registro para leitura
-        reg = (Registro *) malloc(sizeof(Registro));
         anularCampos(reg);
 
         // ler campo CNPJ
         fread(&reg->cnpj,sizeof(char),SIZE_CNPJ,saida);
 
-        // indexar CNPJ nos arquivos de índice
-        fwrite(reg->cnpj, SIZE_CNPJ, 1, ind1);
-        fwrite(reg->cnpj, SIZE_CNPJ, 1, ind2);
-        fwrite(reg->cnpj, SIZE_CNPJ, 1, ind3);
+        // salvar em novo nó na lista de índices
+        indice->lista = (NO**)realloc(indice->lista, sizeof(NO*) * indice->tamanho + 1);
+        indice->lista[indice->tamanho] = (NO*)malloc(sizeof(NO));
+        indice->lista[indice->tamanho]->referencia = 0;
 
-        // indexar referencia (byte offeset) nos arquivos de índice
-        fwrite(&byte_offset, sizeof(int), 1, ind1);
-        fwrite(&byte_offset, sizeof(int), 1, ind2);
-        fwrite(&byte_offset, sizeof(int), 1, ind3);
+        // copiar CNPJ do registro para o novo nó de índice
+        for (i = 0; i < SIZE_CNPJ + 1; i++) {
+            indice->lista[indice->tamanho]->chave[i] = reg->cnpj[i];
+        }
+
+        // salvar byte offset como referência desse CNPJ
+        indice->lista[indice->tamanho]->referencia = byte_offset;
+
+        // aumentar contador da lista de índices
+        indice->tamanho += 1;
 
         // pular campos fixos
         fseek(saida, SIZE_DATA + SIZE_DATA + SIZE_CNPJ, SEEK_CUR);
@@ -73,6 +90,12 @@ int criar_indices(FILE *saida, FILE *ind1, FILE* ind2, FILE* ind3) {
         } while (c != DEL_REG);
 
     } while (!feof(saida));
+        // zerar nova chave
+
+    // ordenar índices
+    
+
+    // escrever índices nos arquivos
 
     return 1;
 
@@ -106,7 +129,18 @@ void remover_indice() {
 	Parâmetros:
         * indice = arquivo de índice primário a ser reorganizado
 */
-void atualizar_indice(FILE* indice) {
+
+NO* copiar_no(NO* a, NO* b) {
+    // copia dados do nó B para nó A
+    strcpy(a->chave, b->chave);
+    a->referencia = b->referencia;
+    return a;
+}
+
+void atualizar_indice(NO* indice) {
+
+
+
 
 }
 
@@ -120,6 +154,20 @@ void atualizar_indice(FILE* indice) {
 */
 void pesquisa_indice_chave(FILE* indice, char* chave) {
 
+    char cnpj[SIZE_CNPJ + 1];
+    char c = '@';
+    char flag = 0;
+    do {
+        // ler campo CNPJ
+        fread(&cnpj,sizeof(char),SIZE_CNPJ,indice);
+        // comparar com conteúdo buscado
+        // se encontrado, retornar byte offset
+        // se não encontrado, pular byte offset
+        fseek(indice, sizeof(int), SEEK_CUR);
+    } while (!feof(indice) || !flag);
+
+    if (!flag) printf("Campo não encontrado!\n");
+
 }
 
 /*
@@ -130,7 +178,24 @@ void pesquisa_indice_chave(FILE* indice, char* chave) {
         * a busca
         * chave = chave de referência a ser buscada
 */
-void pesquisa_indice_ref(FILE* indice, char* chave) {
+void pesquisa_indice_ref(FILE* indice, int chave) {
+
+    char cnpj[SIZE_CNPJ];
+    int referencia;
+    char c = '@';
+    do {
+        // pular campo CNPJ
+        fread(&cnpj,SIZE_CNPJ,1,indice);
+        // ler campo referência
+        fread(&referencia,sizeof(int),1,indice);
+        // comparar com conteúdo buscado
+        if (referencia == chave) {
+            //return cnpj;
+        }
+        // se encontrado, retornar CNPJ
+    } while (!feof(indice));
+
+    printf("Campo não encontrado!\n");
 
 }
 
@@ -142,18 +207,5 @@ void pesquisa_indice_ref(FILE* indice, char* chave) {
 */
 void destruir_indice(FILE* indice) {
 
-}
-
-char* int2string(int val, int base) {
-
-	static char buf[32] = {0};
-
-	int i = 30;
-
-	for(; val && i ; --i, val /= base)
-
-		buf[i] = "0123456789abcdef"[val % base];
-
-	return &buf[i+1];
 
 }

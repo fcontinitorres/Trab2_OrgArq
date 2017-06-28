@@ -20,13 +20,36 @@ Bruno Henrique Rasteiro, 9292910
 
 #include "registro.h"
 
+/********************************************//**
+ *  Definição de nó para lista (índice)
+ *  Funções para manipulação de lista de nós
+ ***********************************************/
+
+typedef struct no {
+
+    char chave[SIZE_CNPJ + 1]; // chave de busca (CNPJ)
+    int referencia; // byte offset
+
+} NO;
+
+typedef struct indice {
+
+    NO** lista;
+    int tamanho;
+
+} INDICE;
+
+/********************************************//**
+ *  Funções para criação e manipulação de índices
+ ***********************************************/
+
 void pesquisa_indice_chave(FILE*, char*); // busca por chave
-void pesquisa_indice_ref(FILE*, char*); // busca por referência
-int criar_indices(FILE* saida, FILE* ind1, FILE* ind2, FILE* ind3); // alocar estruturas e gerar arquivos de índice
+void pesquisa_indice_ref(FILE*, int); // busca por referência
+int criar_indices(FILE* saida, FILE* ind1, FILE* ind2, FILE* ind3); // gerar arquivos de índice iniciais
 void inserir_indice(); // inserir novo item no índice
 void remover_indice(); // remover item do índice
-void atualizar_indice(FILE*); // reordenar
+NO* copiar_no(NO* a, NO* b); // auxiliar para ordenação
+void atualizar_indice(NO* indice); // reordenar
 void destruir_indice(FILE*); // desalocar
-char* int2string(int val, int base); // transforma int em string
 
 #endif
