@@ -74,6 +74,7 @@ int criar_indices(FILE *saida, FILE *ind1, FILE* ind2, FILE* ind3) {
         for (i = 0; i < SIZE_CNPJ + 1; i++) {
             indice->lista[indice->tamanho]->chave[i] = reg->cnpj[i];
         }
+        indice->lista[indice->tamanho]->chave[SIZE_CNPJ + 1] = '\0';
 
         // salvar byte offset como referência desse CNPJ
         indice->lista[indice->tamanho]->referencia = byte_offset;
@@ -93,7 +94,7 @@ int criar_indices(FILE *saida, FILE *ind1, FILE* ind2, FILE* ind3) {
         // zerar nova chave
 
     // ordenar índices
-    
+    indice = atualizar_indice(indice);
 
     // escrever índices nos arquivos
 
@@ -123,25 +124,56 @@ void remover_indice() {
 
 }
 
+
+/*
+    Descrição:
+		* Copia o conteúdo do nó B para o nó A.
+	Parâmetros:
+        * a = Nó que recebe conteúdo
+        * b = Nó que provém conteúdo
+*/
+NO* copiar_no(NO* a, NO* b) {
+    int i;
+    // copia dados do nó B para nó A
+    for (i = 0; i < SIZE_CNPJ + 1; i++) {
+        a->chave[i] = b->chave[i];
+    }
+    a->chave[SIZE_CNPJ + 1] = '\0';
+    a->referencia = b->referencia;
+    return a; 
+}
+
+
 /*
     Descrição:
 		* Reordena arquivo de índices após inserção/remoção.
 	Parâmetros:
         * indice = arquivo de índice primário a ser reorganizado
 */
+INDICE* atualizar_indice(INDICE* indice) {
+    int i, j;
 
-NO* copiar_no(NO* a, NO* b) {
-    // copia dados do nó B para nó A
-    strcpy(a->chave, b->chave);
-    a->referencia = b->referencia;
-    return a;
+    NO* atual = (NO*)malloc(sizeof(NO));
+    
+    for (i = 1; i < indice->tamanho; i++) {
+        atual = copiar_no(atual, indice->lista[i]);
+        j = i - 1;
+        while ((j > 0) && (atoi(indice->lista[j]->chave) > atoi(atual->chave))) {
+            indice->lista[j+1] = copiar_no(indice->lista[j+1], indice->lista[j]);
+            j--;
+        }
+        indice->lista[j+1] = copiar_no(indice->lista[j+1], atual);
+    }
+    
+    imprimir_indice(indice);
+    return indice;
 }
 
-void atualizar_indice(NO* indice) {
-
-
-
-
+void imprimir_indice(INDICE* indice) {
+    int i;
+    for (i = 0; i < indice->tamanho; i++) {
+        printf("Índice [%d]\t%s\t%d\n", i, indice->lista[i]->chave, indice->lista[i]->referencia);
+    }
 }
 
 /*

@@ -49,7 +49,7 @@ int criar_indices(FILE* saida, FILE* ind1, FILE* ind2, FILE* ind3); // gerar arq
 void inserir_indice(); // inserir novo item no índice
 void remover_indice(); // remover item do índice
 NO* copiar_no(NO* a, NO* b); // auxiliar para ordenação
-void atualizar_indice(NO* indice); // reordenar
+INDICE* atualizar_indice(INDICE* indice); // reordenar
 void destruir_indice(FILE*); // desalocar
 
 #endif
