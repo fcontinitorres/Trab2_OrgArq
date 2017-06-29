@@ -43,6 +43,7 @@ typedef struct indice {
  *  Funções para criação e manipulação de índices
  ***********************************************/
 
+int abre_indices(FILE** indice1, FILE** indice2, FILE** indice3);
 void pesquisa_indice_chave(FILE*, char*); // busca por chave
 void pesquisa_indice_ref(FILE*, int); // busca por referência
 INDICE* criar_indices(FILE* saida); // gerar arquivos de índice iniciais

@@ -22,29 +22,16 @@ int main() {
     INDICE* indice = NULL; // índice em memória primária
 
 	// abre e verifica se os arquivos foram abertos com sucesso
-	if (!validaArquivos(&entrada, &saida1, &saida2, &saida3)) {
+	if (!abre_saidas(&entrada, &saida1, &saida2, &saida3)) {
 		printf("\nErro ao abrir arquivos de saída\n");
 		return EXIT_FAILURE;
 	}
 
 	// abre e valida arquivos de índice
-    indice1 = fopen(FILE_IND1, "wb+");
-    if (!indice1) {
-        printf("Erro ao abrir %s\n", FILE_IND1);
-        return EXIT_FAILURE;
-    }
-
-    indice2 = fopen(FILE_IND2, "wb+");
-    if (!indice2) {
-        printf("Erro ao abrir %s\n", FILE_IND2);
-        return EXIT_FAILURE;
-    }
-
-    indice3 = fopen(FILE_IND3, "wb+");
-    if (!indice3) {
-        printf("Erro ao abrir %s\n", FILE_IND3);
-        return EXIT_FAILURE;
-    }
+    if (!abre_indices(&indice1, &indice2, &indice3)) {
+		printf("\nErro ao abrir arquivos de índice\n");
+		return EXIT_FAILURE;
+	}
 
 	printf("\n++++++++++++++++++++++++++++++++++++++++\n");
 	printf("+ TRABALHO 2 - ORGANIZAÇÃO DE ARQUIVOS +\n");

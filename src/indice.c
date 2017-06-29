@@ -12,6 +12,34 @@ Bruno Henrique Rasteiro, 9292910
  *  Funções para criação e manipulação de índices
  ***********************************************/
 
+ /*
+     Descrição:
+ 		* Abre e valida arquivos de índice
+ 	Parâmetros:
+         * FILE* ponteiros para arquivos de índice binários
+ */
+int abre_indices(FILE** indice1, FILE** indice2, FILE** indice3) {
+    // abre e valida arquivos de índice
+    *indice1 = fopen(FILE_IND1, "wb+");
+    if (!(*indice1)) {
+        printf("Erro ao abrir %s\n", FILE_IND1);
+        return EXIT_FAILURE;
+    }
+
+    *indice2 = fopen(FILE_IND2, "wb+");
+    if (!(*indice2)) {
+        printf("Erro ao abrir %s\n", FILE_IND2);
+        return EXIT_FAILURE;
+    }
+
+    *indice3 = fopen(FILE_IND3, "wb+");
+    if (!(*indice3)) {
+        printf("Erro ao abrir %s\n", FILE_IND3);
+        return EXIT_FAILURE;
+    }
+    return 1;
+}
+
 /*
     Descrição:
 		* Gera arquivo de índice primário baseado nos registros do arquivo 'saida', gravando no arquivo 'indice_primario'
