@@ -43,13 +43,17 @@ typedef struct indice {
  *  Funções para criação e manipulação de índices
  ***********************************************/
 
-void pesquisa_indice_chave(FILE*, char*); // busca por chave
-void pesquisa_indice_ref(FILE*, int); // busca por referência
+//int pesquisa_indice_chave(FILE*, char*); // busca por chave
+//void pesquisa_indice_ref(FILE*, int); // busca por referência
+int pesquisa_indice(INDICE* indice, char* chave);
 int criar_indices(FILE* saida, FILE* ind1, FILE* ind2, FILE* ind3); // gerar arquivos de índice iniciais
 void inserir_indice(); // inserir novo item no índice
-void remover_indice(); // remover item do índice
+int remover(FILE* file, INDICE* indice, char* chave); // remover um registro (remove tanto no indice quanto no arquivo de dados)
+int remover_indice(INDICE* indice, char* chave); // remover item do índice
+void remover_dado(FILE* file, int referencia); // remove logicamente o registro do arquivo de dados
 NO* copiar_no(NO* a, NO* b); // auxiliar para ordenação
 INDICE* atualizar_indice(INDICE* indice); // reordenar
 void destruir_indice(FILE*); // desalocar
+void imprimir_indice(INDICE* indice); // imprime o indice no terminal
 
 #endif

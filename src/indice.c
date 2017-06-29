@@ -74,7 +74,7 @@ int criar_indices(FILE *saida, FILE *ind1, FILE* ind2, FILE* ind3) {
         for (i = 0; i < SIZE_CNPJ + 1; i++) {
             indice->lista[indice->tamanho]->chave[i] = reg->cnpj[i];
         }
-        indice->lista[indice->tamanho]->chave[SIZE_CNPJ + 1] = '\0';
+        indice->lista[indice->tamanho]->chave[SIZE_CNPJ] = '\0';
 
         // salvar byte offset como referência desse CNPJ
         indice->lista[indice->tamanho]->referencia = byte_offset;
@@ -110,18 +110,83 @@ int criar_indices(FILE *saida, FILE *ind1, FILE* ind2, FILE* ind3) {
         *
 */
 void inserir_indice() {
+    
+}
 
+
+int remover(FILE* file, INDICE* indice, char* chave){
+    int referencia;
+
+    // pesquisa referência do registro no arquivo de índice
+    referencia = pesquisa_indice(indice, chave);
+
+    // se o registro 
+    if (referencia != -1){
+        
+        // remove lógicamente do arquivo de dados
+        remover_dado(file, referencia);
+
+        // remove fisicamente do índice em memória ram
+        remover_indice(indice, chave);
+
+        return(1);
+    }
+
+    return(0);
+}
+/*
+    Descrição:
+		* Remove um índice do índice em RAM,
+		* reorganizando em seguida.
+	Parâmetros:
+        * indice = ponteiro para o índice em RAM
+        * chave = chave (string) de busca para a remoção
+*/
+int remover_indice(INDICE* indice, char* chave) {
+    int i;
+    int k;
+    int cmp;
+    int removeu = 0;
+
+    for (i=0; i < indice->tamanho; i++){
+        cmp = strcmp(chave, indice->lista[i]->chave);
+
+        if (cmp == 0){
+            // removendo indice
+            free(indice->lista[k]);
+            
+            // atualizando vetor de indices
+            for (k=i+1; k < indice->tamanho; k++)
+                indice->lista[k-1] = indice->lista[k];
+            
+            // atualizando tamanho do indice
+            indice->tamanho--;
+
+            removeu = 1;
+            break;
+        }
+        else if (cmp > 0)
+            break;
+    }
+
+    return(removeu);
 }
 
 /*
     Descrição:
-		* Remove um índice de um arquivo de índices,
-		* reorganizando em seguida.
-	Parâmetros:
-        *
+        * Remove um ,
+        * reorganizando em seguida.
+    Parâmetros:
+        
 */
-void remover_indice() {
+void remover_dado(FILE* file, int referencia){
+    char exc_log = EXC_LOG; 
 
+    // fseek até o registro a ser deletado
+    fseek (file, referencia, SEEK_SET);
+
+    // grava o caracter de exclusão lógica
+    fwrite(&exc_log, sizeof(char), sizeof(exc_log), file);
 }
 
 
@@ -176,30 +241,60 @@ void imprimir_indice(INDICE* indice) {
     }
 }
 
+int pesquisa_indice(INDICE* indice, char* chave){
+    int i;
+    int cmp;
+    int referencia = -1;
+
+    for (i=0; i < indice->tamanho; i++){
+        cmp = strcmp(chave, indice->lista[i]->chave);
+
+        if (cmp == 0){
+            // salvando referencia para retornar
+            referencia = indice->lista[i]->referencia;
+            break;
+        }
+        else if (cmp > 0)
+            break;
+    }
+
+    return(referencia);
+}
 /*
     Descrição:
 		* Pesquisa índice pela chave de busca, retornando
-		* o valor de referência
+		* a referencia (byte offset) do registro
 	Parâmetros:
         * indice = arquivo de índice onde será feita a busca
         * chave = chave a ser buscada
 */
-void pesquisa_indice_chave(FILE* indice, char* chave) {
+int pesquisa_indice_chave(FILE* indice, char* chave) {
 
     char cnpj[SIZE_CNPJ + 1];
-    char c = '@';
-    char flag = 0;
+    int bos;
+    int cmp;
+
     do {
         // ler campo CNPJ
-        fread(&cnpj,sizeof(char),SIZE_CNPJ,indice);
+        fread(cnpj, sizeof(char), SIZE_CNPJ, indice);
+        
         // comparar com conteúdo buscado
-        // se encontrado, retornar byte offset
+        cmp = strcmp(chave, cnpj);
+        
+        // se encontrou
+        if (cmp == 0){
+            // ler campo CNPJ
+            fread(&bos, sizeof(int), 1, indice);
+            // retornar byte offset
+            return(bos);
+        }
+        
         // se não encontrado, pular byte offset
         fseek(indice, sizeof(int), SEEK_CUR);
-    } while (!feof(indice) || !flag);
+    } while (!feof(indice) || cmp < 0);
 
-    if (!flag) printf("Campo não encontrado!\n");
-
+    if (cmp > 0) 
+        return(-1);
 }
 
 /*

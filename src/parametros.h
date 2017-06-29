@@ -22,6 +22,9 @@ Bruno Henrique Rasteiro, 9292910
 // delimitador do campo arquivo de saída
 #define DEL_FIELD ';' // TODO: mudar delimitador de campo
 
+// caracter para marcar exclusão lógica de registro no arquivo de dados 
+#define EXC_LOG '@';
+
 // caminho do arquivo de entrada
 #define FILE_IN "data/dados.csv"
 
