@@ -17,6 +17,7 @@ Bruno Henrique Rasteiro, 9292910
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "registro.h"
 
@@ -34,8 +35,8 @@ typedef struct no {
 
 typedef struct indice {
 
-    NO** lista;
-    int tamanho;
+    NO** lista; // lista de nós
+    int tamanho; // mantém tamanho atualizado
 
 } INDICE;
 
@@ -44,6 +45,7 @@ typedef struct indice {
  ***********************************************/
 
 int abre_indices(FILE** indice1, FILE** indice2, FILE** indice3);
+void imprimir_indice(INDICE* indice);
 void pesquisa_indice_chave(FILE*, char*); // busca por chave
 void pesquisa_indice_ref(FILE*, int); // busca por referência
 INDICE* criar_indices(FILE* saida); // gerar arquivos de índice iniciais

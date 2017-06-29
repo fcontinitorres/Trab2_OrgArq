@@ -156,6 +156,23 @@ NO* copiar_no(NO* a, NO* b) {
 
 /*
     Descrição:
+		* Converte string CNPJ para número
+	Parâmetros:
+        * char* CNPJ - string a ser convertida
+*/
+long int converter_CNPJ(char* CNPJ) {
+    int i;
+    long int convertido = 0;
+    for (i = 0; i < SIZE_CNPJ - 1; i++) {
+        if (isdigit(CNPJ[i])) {
+            convertido = (convertido * 10) + (CNPJ[i] - '0');
+        }
+    }
+    return convertido;
+}
+
+/*
+    Descrição:
 		* Reordena arquivo de índices após inserção/remoção.
 	Parâmetros:
         * indice = arquivo de índice primário a ser reorganizado
@@ -168,7 +185,7 @@ INDICE* atualizar_indice(INDICE* indice) {
     for (i = 1; i < indice->tamanho; i++) {
         atual = copiar_no(atual, indice->lista[i]);
         j = i - 1;
-        while ((j > 0) && (atoi(indice->lista[j]->chave) > atoi(atual->chave))) {
+        while ((j > 0) && (converter_CNPJ(indice->lista[j]->chave) > converter_CNPJ(atual->chave))) {
             indice->lista[j+1] = copiar_no(indice->lista[j+1], indice->lista[j]);
             j--;
         }
@@ -179,8 +196,15 @@ INDICE* atualizar_indice(INDICE* indice) {
     return indice;
 }
 
+/*
+    Descrição:
+		* Imprime índice de forma tabelada
+	Parâmetros:
+        * indice = índice em memória primária que será exibido
+*/
 void imprimir_indice(INDICE* indice) {
     int i, j;
+    printf("[ÍNDICE]\t[CNPJ]\t\t\t[BYTE OFFSET]\n");
     for (i = 0; i < indice->tamanho; i++) {
         printf("ÍNDICE [%d]\t", i);
         // imprimir CNPJ
@@ -203,7 +227,6 @@ void imprimir_indice(INDICE* indice) {
 void pesquisa_indice_chave(FILE* indice, char* chave) {
 
     char cnpj[SIZE_CNPJ + 1];
-    char c = '@';
     char flag = 0;
     do {
         // ler campo CNPJ
@@ -230,7 +253,6 @@ void pesquisa_indice_ref(FILE* indice, int chave) {
 
     char cnpj[SIZE_CNPJ];
     int referencia;
-    char c = '@';
     do {
         // pular campo CNPJ
         fread(&cnpj,SIZE_CNPJ,1,indice);
