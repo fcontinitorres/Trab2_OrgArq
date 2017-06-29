@@ -20,7 +20,7 @@ Bruno Henrique Rasteiro, 9292910
         * dados obtidos a partir da leitura do csv
         * FILE* indice_primario = arquivo de índice primário a ser gerado
 */
-int criar_indices(FILE *saida, FILE *ind1, FILE* ind2, FILE* ind3) {
+INDICE* criar_indices(FILE *saida) {
 
     int i;
     // inicializar registro
@@ -33,25 +33,6 @@ int criar_indices(FILE *saida, FILE *ind1, FILE* ind2, FILE* ind3) {
     INDICE* indice = (INDICE*)malloc(sizeof(INDICE));
     indice->lista = (NO**)malloc(sizeof(NO**));
     indice->tamanho = 0;
-
-    // abre e valida arquivos de índice
-    ind1 = fopen(FILE_IND1, "wb+");
-    if (!ind1) {
-        printf("Erro ao abrir %s\n", FILE_IND1);
-        return EXIT_FAILURE;
-    }
-
-    ind2 = fopen(FILE_IND2, "wb+");
-    if (!ind2) {
-        printf("Erro ao abrir %s\n", FILE_IND2);
-        return EXIT_FAILURE;
-    }
-
-    ind3 = fopen(FILE_IND3, "wb+");
-    if (!ind3) {
-        printf("Erro ao abrir %s\n", FILE_IND3);
-        return EXIT_FAILURE;
-    }
 
     // percorrer arquivo binário
     do {
@@ -91,14 +72,17 @@ int criar_indices(FILE *saida, FILE *ind1, FILE* ind2, FILE* ind3) {
         } while (c != DEL_REG);
 
     } while (!feof(saida));
-        // zerar nova chave
 
     // ordenar índices
     indice = atualizar_indice(indice);
 
-    // escrever índices nos arquivos
+    if (!indice) {
+        printf("Algum erro ocorreu com o índice em memória primária\n");
+        exit(0);
+    }
 
-    return 1;
+    // retornar índice (em memória primária)
+    return indice;
 
 }
 
@@ -124,7 +108,6 @@ void remover_indice() {
 
 }
 
-
 /*
     Descrição:
 		* Copia o conteúdo do nó B para o nó A.
@@ -140,9 +123,8 @@ NO* copiar_no(NO* a, NO* b) {
     }
     a->chave[SIZE_CNPJ + 1] = '\0';
     a->referencia = b->referencia;
-    return a; 
+    return a;
 }
-
 
 /*
     Descrição:
@@ -154,7 +136,7 @@ INDICE* atualizar_indice(INDICE* indice) {
     int i, j;
 
     NO* atual = (NO*)malloc(sizeof(NO));
-    
+
     for (i = 1; i < indice->tamanho; i++) {
         atual = copiar_no(atual, indice->lista[i]);
         j = i - 1;
@@ -164,15 +146,21 @@ INDICE* atualizar_indice(INDICE* indice) {
         }
         indice->lista[j+1] = copiar_no(indice->lista[j+1], atual);
     }
-    
+
     imprimir_indice(indice);
     return indice;
 }
 
 void imprimir_indice(INDICE* indice) {
-    int i;
+    int i, j;
     for (i = 0; i < indice->tamanho; i++) {
-        printf("Índice [%d]\t%s\t%d\n", i, indice->lista[i]->chave, indice->lista[i]->referencia);
+        printf("ÍNDICE [%d]\t", i);
+        // imprimir CNPJ
+        for (j = 0; j < SIZE_CNPJ; j++) {
+            printf("%c", indice->lista[i]->chave[j]);
+        }
+        // imprimir referência
+        printf("\t%d\n", indice->lista[i]->referencia);
     }
 }
 

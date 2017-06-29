@@ -45,10 +45,11 @@ typedef struct indice {
 
 void pesquisa_indice_chave(FILE*, char*); // busca por chave
 void pesquisa_indice_ref(FILE*, int); // busca por referência
-int criar_indices(FILE* saida, FILE* ind1, FILE* ind2, FILE* ind3); // gerar arquivos de índice iniciais
+INDICE* criar_indices(FILE* saida); // gerar arquivos de índice iniciais
 void inserir_indice(); // inserir novo item no índice
 void remover_indice(); // remover item do índice
 NO* copiar_no(NO* a, NO* b); // auxiliar para ordenação
+void imprimir_indice(INDICE* indice); // imprime estrutura de índice completa
 INDICE* atualizar_indice(INDICE* indice); // reordenar
 void destruir_indice(FILE*); // desalocar
 

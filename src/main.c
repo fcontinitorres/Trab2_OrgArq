@@ -19,11 +19,32 @@ int main() {
 	FILE *entrada, *saida1, *saida2, *saida3; // arquivos de dados
 	FILE *indice1, *indice2, *indice3; // arquivos de índice primário
 
+    INDICE* indice = NULL; // índice em memória primária
+
 	// abre e verifica se os arquivos foram abertos com sucesso
 	if (!validaArquivos(&entrada, &saida1, &saida2, &saida3)) {
-		printf("\nERRO AO ABRIR ARQUIVOS\n");
+		printf("\nErro ao abrir arquivos de saída\n");
 		return EXIT_FAILURE;
 	}
+
+	// abre e valida arquivos de índice
+    indice1 = fopen(FILE_IND1, "wb+");
+    if (!indice1) {
+        printf("Erro ao abrir %s\n", FILE_IND1);
+        return EXIT_FAILURE;
+    }
+
+    indice2 = fopen(FILE_IND2, "wb+");
+    if (!indice2) {
+        printf("Erro ao abrir %s\n", FILE_IND2);
+        return EXIT_FAILURE;
+    }
+
+    indice3 = fopen(FILE_IND3, "wb+");
+    if (!indice3) {
+        printf("Erro ao abrir %s\n", FILE_IND3);
+        return EXIT_FAILURE;
+    }
 
 	printf("\n++++++++++++++++++++++++++++++++++++++++\n");
 	printf("+ TRABALHO 2 - ORGANIZAÇÃO DE ARQUIVOS +\n");
@@ -37,11 +58,8 @@ int main() {
 	fseek(saida2, 0, SEEK_SET);
 	fseek(saida3, 0, SEEK_SET);
 
-	// gerar arquivos de índice primário
-	if (!(criar_indices(saida1, indice1, indice2, indice3))) {
-		printf("Erro ao gerar arquivos de índices\n");
-		return EXIT_FAILURE;
-	}
+	// gerar índice primário (em memória primária)
+	indice = criar_indices(saida1);
 
 	// fechando arquivo de entrada
 	fclose(entrada);
@@ -97,10 +115,15 @@ int main() {
 		}
 	}
 
-	// fechando arquivos
+	// fechando arquivos de saída
 	fclose(saida1);
 	fclose(saida2);
 	fclose(saida3);
+
+	// fechando arquivos de índice
+	fclose(indice1);
+	fclose(indice2);
+	fclose(indice3);
 
 	// TODO - Destruir índices
 	// TODO - Destruir qualquer coisa alocada em heap
