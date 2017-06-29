@@ -20,7 +20,7 @@ Bruno Henrique Rasteiro, 9292910
 		1 -> Arquivos aberto com sucesso
 		EXIT_FAILURE -> Falha ao abrir arquivos
 */
-int validaArquivos(FILE **entrada, FILE **saida1, FILE **saida2, FILE **saida3) {
+int abre_saidas(FILE **entrada, FILE **saida1, FILE **saida2, FILE **saida3) {
 
 	// abrindo arquivos
     *entrada  = fopen(FILE_IN, "r");

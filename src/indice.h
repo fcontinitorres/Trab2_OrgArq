@@ -17,6 +17,7 @@ Bruno Henrique Rasteiro, 9292910
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "registro.h"
 
@@ -34,8 +35,8 @@ typedef struct no {
 
 typedef struct indice {
 
-    NO** lista;
-    int tamanho;
+    NO** lista; // lista de nós
+    int tamanho; // mantém tamanho atualizado
 
 } INDICE;
 
@@ -46,14 +47,16 @@ typedef struct indice {
 //int pesquisa_indice_chave(FILE*, char*); // busca por chave
 //void pesquisa_indice_ref(FILE*, int); // busca por referência
 int pesquisa_indice(INDICE* indice, char* chave);
-int criar_indices(FILE* saida, FILE* ind1, FILE* ind2, FILE* ind3); // gerar arquivos de índice iniciais
+int abre_indices(FILE** indice1, FILE** indice2, FILE** indice3);
+void imprimir_indice(INDICE* indice);
+INDICE* criar_indices(FILE* saida); // gerar arquivos de índice iniciais
 void inserir_indice(); // inserir novo item no índice
 int remover(FILE* file, INDICE* indice, char* chave); // remover um registro (remove tanto no indice quanto no arquivo de dados)
 int remover_indice(INDICE* indice, char* chave); // remover item do índice
 void remover_dado(FILE* file, int referencia); // remove logicamente o registro do arquivo de dados
 NO* copiar_no(NO* a, NO* b); // auxiliar para ordenação
+void imprimir_indice(INDICE* indice); // imprime estrutura de índice completa
 INDICE* atualizar_indice(INDICE* indice); // reordenar
 void destruir_indice(FILE*); // desalocar
-void imprimir_indice(INDICE* indice); // imprime o indice no terminal
 
 #endif

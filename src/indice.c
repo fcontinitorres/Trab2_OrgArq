@@ -12,6 +12,34 @@ Bruno Henrique Rasteiro, 9292910
  *  Funções para criação e manipulação de índices
  ***********************************************/
 
+ /*
+     Descrição:
+ 		* Abre e valida arquivos de índice
+ 	Parâmetros:
+         * FILE* ponteiros para arquivos de índice binários
+ */
+int abre_indices(FILE** indice1, FILE** indice2, FILE** indice3) {
+    // abre e valida arquivos de índice
+    *indice1 = fopen(FILE_IND1, "wb+");
+    if (!(*indice1)) {
+        printf("Erro ao abrir %s\n", FILE_IND1);
+        return EXIT_FAILURE;
+    }
+
+    *indice2 = fopen(FILE_IND2, "wb+");
+    if (!(*indice2)) {
+        printf("Erro ao abrir %s\n", FILE_IND2);
+        return EXIT_FAILURE;
+    }
+
+    *indice3 = fopen(FILE_IND3, "wb+");
+    if (!(*indice3)) {
+        printf("Erro ao abrir %s\n", FILE_IND3);
+        return EXIT_FAILURE;
+    }
+    return 1;
+}
+
 /*
     Descrição:
 		* Gera arquivo de índice primário baseado nos registros do arquivo 'saida', gravando no arquivo 'indice_primario'
@@ -20,7 +48,7 @@ Bruno Henrique Rasteiro, 9292910
         * dados obtidos a partir da leitura do csv
         * FILE* indice_primario = arquivo de índice primário a ser gerado
 */
-int criar_indices(FILE *saida, FILE *ind1, FILE* ind2, FILE* ind3) {
+INDICE* criar_indices(FILE *saida) {
 
     int i;
     // inicializar registro
@@ -33,25 +61,6 @@ int criar_indices(FILE *saida, FILE *ind1, FILE* ind2, FILE* ind3) {
     INDICE* indice = (INDICE*)malloc(sizeof(INDICE));
     indice->lista = (NO**)malloc(sizeof(NO**));
     indice->tamanho = 0;
-
-    // abre e valida arquivos de índice
-    ind1 = fopen(FILE_IND1, "wb+");
-    if (!ind1) {
-        printf("Erro ao abrir %s\n", FILE_IND1);
-        return EXIT_FAILURE;
-    }
-
-    ind2 = fopen(FILE_IND2, "wb+");
-    if (!ind2) {
-        printf("Erro ao abrir %s\n", FILE_IND2);
-        return EXIT_FAILURE;
-    }
-
-    ind3 = fopen(FILE_IND3, "wb+");
-    if (!ind3) {
-        printf("Erro ao abrir %s\n", FILE_IND3);
-        return EXIT_FAILURE;
-    }
 
     // percorrer arquivo binário
     do {
@@ -91,14 +100,17 @@ int criar_indices(FILE *saida, FILE *ind1, FILE* ind2, FILE* ind3) {
         } while (c != DEL_REG);
 
     } while (!feof(saida));
-        // zerar nova chave
 
     // ordenar índices
     indice = atualizar_indice(indice);
 
-    // escrever índices nos arquivos
+    if (!indice) {
+        printf("Algum erro ocorreu com o índice em memória primária\n");
+        exit(0);
+    }
 
-    return 1;
+    // retornar índice (em memória primária)
+    return indice;
 
 }
 
@@ -189,7 +201,6 @@ void remover_dado(FILE* file, int referencia){
     fwrite(&exc_log, sizeof(char), sizeof(exc_log), file);
 }
 
-
 /*
     Descrição:
 		* Copia o conteúdo do nó B para o nó A.
@@ -205,9 +216,25 @@ NO* copiar_no(NO* a, NO* b) {
     }
     a->chave[SIZE_CNPJ + 1] = '\0';
     a->referencia = b->referencia;
-    return a; 
+    return a;
 }
 
+/*
+    Descrição:
+		* Converte string CNPJ para número
+	Parâmetros:
+        * char* CNPJ - string a ser convertida
+*/
+long int converter_CNPJ(char* CNPJ) {
+    int i;
+    long int convertido = 0;
+    for (i = 0; i < SIZE_CNPJ - 1; i++) {
+        if (isdigit(CNPJ[i])) {
+            convertido = (convertido * 10) + (CNPJ[i] - '0');
+        }
+    }
+    return convertido;
+}
 
 /*
     Descrição:
@@ -219,25 +246,38 @@ INDICE* atualizar_indice(INDICE* indice) {
     int i, j;
 
     NO* atual = (NO*)malloc(sizeof(NO));
-    
+
     for (i = 1; i < indice->tamanho; i++) {
         atual = copiar_no(atual, indice->lista[i]);
         j = i - 1;
-        while ((j > 0) && (atoi(indice->lista[j]->chave) > atoi(atual->chave))) {
+        while ((j > 0) && (converter_CNPJ(indice->lista[j]->chave) > converter_CNPJ(atual->chave))) {
             indice->lista[j+1] = copiar_no(indice->lista[j+1], indice->lista[j]);
             j--;
         }
         indice->lista[j+1] = copiar_no(indice->lista[j+1], atual);
     }
-    
+
     imprimir_indice(indice);
     return indice;
 }
 
+/*
+    Descrição:
+		* Imprime índice de forma tabelada
+	Parâmetros:
+        * indice = índice em memória primária que será exibido
+*/
 void imprimir_indice(INDICE* indice) {
-    int i;
+    int i, j;
+    printf("[ÍNDICE]\t[CNPJ]\t\t\t[BYTE OFFSET]\n");
     for (i = 0; i < indice->tamanho; i++) {
-        printf("Índice [%d]\t%s\t%d\n", i, indice->lista[i]->chave, indice->lista[i]->referencia);
+        printf("ÍNDICE [%d]\t", i);
+        // imprimir CNPJ
+        for (j = 0; j < SIZE_CNPJ; j++) {
+            printf("%c", indice->lista[i]->chave[j]);
+        }
+        // imprimir referência
+        printf("\t%d\n", indice->lista[i]->referencia);
     }
 }
 
@@ -309,7 +349,6 @@ void pesquisa_indice_ref(FILE* indice, int chave) {
 
     char cnpj[SIZE_CNPJ];
     int referencia;
-    char c = '@';
     do {
         // pular campo CNPJ
         fread(&cnpj,SIZE_CNPJ,1,indice);
