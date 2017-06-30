@@ -40,13 +40,67 @@ int abre_indices(FILE** indice1, FILE** indice2, FILE** indice3) {
     return 1;
 }
 
+
 /*
     Descrição:
-		* Gera arquivo de índice primário baseado nos registros do arquivo 'saida', gravando no arquivo 'indice_primario'
+		* Gera índice em memória primária a partir de um
+		* armazenado em memória secundária
+	Parâmetros:
+        * FILE* arquivo = arquivo contendo índice primário
+        * INDICE* indice = índice a ser carregado em memória primária
+*/
+INDICE* ler_indice(FILE* arquivo, INDICE* indice) {
+
+    // inicializa valores para leitura
+    char* CNPJ = (char*)malloc(sizeof(char) * SIZE_CNPJ + 1);
+    int referencia = 0;
+
+    // inicializa índice em memória primária
+    indice = (INDICE*)malloc(sizeof(INDICE));
+    indice->lista = (NO**)malloc(sizeof(NO**));
+    indice->tamanho = 0;
+
+    // leitura do arquivo
+    do {
+
+        // ler CNPJ
+        fread(CNPJ, SIZE_CNPJ, 1, arquivo);
+        // ler referencia
+        fread(&referencia, sizeof(int), 1, arquivo);
+
+        indice = inserir_indice(indice, CNPJ, referencia);
+
+    } while(!feof(arquivo));
+
+    return indice;
+
+}
+
+/*
+    Descrição:
+		* Gera arquivo de índice em memória secundária
+		* a partir de um índice em memória primária
+	Parâmetros:
+        * FILE* arquivo = arquivo que receberá índice
+        * INDICE* indice = índice que está em memória primária
+*/
+void escrever_indice(INDICE* indice, FILE* arquivo) {
+
+    int i;
+    for (i = 0; i < indice->tamanho; i++) {
+        // escrever CNPJ
+        fwrite(indice->lista[i]->chave, SIZE_CNPJ, 1, arquivo);
+        // escrever referencia
+        fwrite(&indice->lista[i]->referencia, sizeof(int), 1, arquivo);
+    }
+}
+
+/*
+    Descrição:
+		* Gera índice primário baseado nos registros do arquivo 'saida', gravando em memória primária
 	Parâmetros:
         * FILE* saida = arquivo binário com os
         * dados obtidos a partir da leitura do csv
-        * FILE* indice_primario = arquivo de índice primário a ser gerado
 */
 INDICE* criar_indices(FILE *saida) {
 
@@ -121,20 +175,47 @@ INDICE* criar_indices(FILE *saida) {
 	Parâmetros:
         *
 */
-void inserir_indice() {
-    
+INDICE* inserir_indice(INDICE* indice, char* CNPJ, int referencia) {
+
+    int i;
+
+    // salvar em novo nó na lista de índices
+    indice->lista = (NO**)realloc(indice->lista, sizeof(NO*) * indice->tamanho + 1);
+    indice->lista[indice->tamanho] = (NO*)malloc(sizeof(NO));
+
+    // copiar CNPJ para o novo nó de índice
+    for (i = 0; i < SIZE_CNPJ + 1; i++) {
+        indice->lista[indice->tamanho]->chave[i] = CNPJ[i];
+    }
+    indice->lista[indice->tamanho]->chave[SIZE_CNPJ] = '\0';
+
+    // salvar referência desse CNPJ
+    indice->lista[indice->tamanho]->referencia = referencia;
+
+    // aumentar contador da lista de índices
+    indice->tamanho += 1;
+
+    // reordenar (insertion sort rápido para lista quase ordenada)
+    indice = atualizar_indice(indice);
+
+    return indice;
 }
 
+/*
+    Descrição:
 
+	Parâmetros:
+
+*/
 int remover(FILE* file, INDICE* indice, char* chave){
     int referencia;
 
     // pesquisa referência do registro no arquivo de índice
     referencia = pesquisa_indice(indice, chave);
 
-    // se o registro 
-    if (referencia != -1){
-        
+    // se o registro existe
+    if (referencia != -1) {
+
         // remove lógicamente do arquivo de dados
         remover_dado(file, referencia);
 
@@ -146,6 +227,7 @@ int remover(FILE* file, INDICE* indice, char* chave){
 
     return(0);
 }
+
 /*
     Descrição:
 		* Remove um índice do índice em RAM,
@@ -166,11 +248,12 @@ int remover_indice(INDICE* indice, char* chave) {
         if (cmp == 0){
             // removendo indice
             free(indice->lista[k]);
-            
+
             // atualizando vetor de indices
             for (k=i+1; k < indice->tamanho; k++)
+                // TODO - acho melhor usar copiar_no
                 indice->lista[k-1] = indice->lista[k];
-            
+
             // atualizando tamanho do indice
             indice->tamanho--;
 
@@ -189,10 +272,10 @@ int remover_indice(INDICE* indice, char* chave) {
         * Remove um ,
         * reorganizando em seguida.
     Parâmetros:
-        
+
 */
 void remover_dado(FILE* file, int referencia){
-    char exc_log = EXC_LOG; 
+    char exc_log = EXC_LOG;
 
     // fseek até o registro a ser deletado
     fseek (file, referencia, SEEK_SET);
@@ -250,7 +333,7 @@ INDICE* atualizar_indice(INDICE* indice) {
     for (i = 1; i < indice->tamanho; i++) {
         atual = copiar_no(atual, indice->lista[i]);
         j = i - 1;
-        while ((j > 0) && (converter_CNPJ(indice->lista[j]->chave) > converter_CNPJ(atual->chave))) {
+        while ((j >= 0) && (converter_CNPJ(indice->lista[j]->chave) > converter_CNPJ(atual->chave))) {
             indice->lista[j+1] = copiar_no(indice->lista[j+1], indice->lista[j]);
             j--;
         }
@@ -317,10 +400,10 @@ int pesquisa_indice_chave(FILE* indice, char* chave) {
     do {
         // ler campo CNPJ
         fread(cnpj, sizeof(char), SIZE_CNPJ, indice);
-        
+
         // comparar com conteúdo buscado
         cmp = strcmp(chave, cnpj);
-        
+
         // se encontrou
         if (cmp == 0){
             // ler campo CNPJ
@@ -328,12 +411,12 @@ int pesquisa_indice_chave(FILE* indice, char* chave) {
             // retornar byte offset
             return(bos);
         }
-        
+
         // se não encontrado, pular byte offset
         fseek(indice, sizeof(int), SEEK_CUR);
     } while (!feof(indice) || cmp < 0);
 
-    if (cmp > 0) 
+    if (cmp > 0)
         return(-1);
 }
 
@@ -367,11 +450,20 @@ void pesquisa_indice_ref(FILE* indice, int chave) {
 
 /*
     Descrição:
-		* Destrói arquivo de índices ao final da execução
+		* Destrói índice da memória primária
 	Parâmetros:
-        * indice = arquivo a ser destruído
+        * indice = a ser destruído
 */
-void destruir_indice(FILE* indice) {
+void destruir_indice(INDICE** indice) {
+    int i;
+    for (i = 0; i < (*indice)->tamanho; i++) {
+        free((*indice)->lista[i]);
+        (*indice)->lista[i] = NULL;
+    }
+    free((*indice)->lista);
+    (*indice)->lista = NULL;
 
+    free((*indice));
+    (*indice) = NULL;
 
 }
