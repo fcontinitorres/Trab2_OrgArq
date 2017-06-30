@@ -28,7 +28,7 @@ Bruno Henrique Rasteiro, 9292910
 typedef struct no {
 
     char chave[SIZE_CNPJ + 1]; // chave de busca (CNPJ)
-    int referencia; // byte offset
+    long int referencia; // byte offset
 
 } NO;
 
@@ -47,7 +47,9 @@ typedef struct indice {
 //void pesquisa_indice_ref(FILE*, int); // busca por referência
 int pesquisa_indice(INDICE* indice, char* chave);
 int criar_indices(FILE* saida, FILE* ind1, FILE* ind2, FILE* ind3); // gerar arquivos de índice iniciais
-void inserir_indice(); // inserir novo item no índice
+int inserirFF(FILE* file, INDICE* indice, Registro* reg);
+long int inserirFF_dado(FILE* file, Registro* reg);
+void inserirFF_indice(INDICE* indice, char* chave, long int referencia);
 int remover(FILE* file, INDICE* indice, char* chave); // remover um registro (remove tanto no indice quanto no arquivo de dados)
 int remover_indice(INDICE* indice, char* chave); // remover item do índice
 void remover_dado(FILE* file, int referencia); // remove logicamente o registro do arquivo de dados
