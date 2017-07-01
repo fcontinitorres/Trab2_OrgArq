@@ -21,10 +21,12 @@ char* readStr(int len){
 	fgets(str, len, stdin);
 
 	for (i = 0; i < len; i++)
-		if (str[i] == '\0')
+		if (str[i] == '\n')
 			break;
 
-	str = (char *) realloc(str, (i+1) * sizeof(char));
+	str[i] = '\0';
+	
+	str = (char *) realloc(str, (i) * sizeof(char));
 
 	return(str);
 }
@@ -159,34 +161,56 @@ void opcao3(INDICE* indice1, INDICE* indice2, INDICE* indice3, FILE* saida1, FIL
 	printf("Informe o CNPJ: ");
 	str = readStr(SIZE_CNPJ + 1);
 	strcpy(reg->cnpj, str);
+	getchar();
 	free(str);
+	printf("CNPJ = '%s'", reg->cnpj);
 
 	printf("Informe a Data de Registro: ");
 	str = readStr(SIZE_DATA + 1);
 	strcpy(reg->dtReg, str);
+	getchar();
 	free(str);
+	printf("DtReg = '%s'", reg->dtReg);
+
+
 
 	printf("Informe a Data de Cancelamento: ");
 	str = readStr(SIZE_DATA + 1);
 	strcpy(reg->dtCanc, str);
+	getchar();
 	free(str);
+	printf("DtCanc = '%s'", reg->dtCanc);
+
 
 	printf("Informe o CNPJ da empresa auditora: ");
 	str = readStr(SIZE_CNPJ + 1);
 	strcpy(reg->cnpjAud, str);
+	getchar();
 	free(str);
+	printf("CNPJ Aud = '%s'", reg->cnpjAud);
+
 
 	printf("Informe a razao social: ");
 	reg->razSoc = readStr(1000);
+	printf("RazSocial = '%s'", reg->razSoc);
+
 
 	printf("Informe o nome fantasia: ");
 	reg->nomeFant = readStr(1000);
+	printf("nomeFant = '%s'", reg->nomeFant);
+
+
 
 	printf("Informe o motivo de cancelamento: ");
 	reg->motCanc = readStr(1000);
+	printf("motCanc = '%s'", reg->motCanc);
+
+
 
 	printf("Informe o nome da empresa auditora: ");
 	reg->nomeEmp = readStr(1000);
+	printf("nomeEmp = '%s'", reg->nomeEmp);
+
 
 	// inserindo
 	if (inserirFF(saida1, indice1, reg))
