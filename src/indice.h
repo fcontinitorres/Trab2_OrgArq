@@ -53,11 +53,11 @@ INDICE* inserir_indice(INDICE* indice, char* CNPJ, int referencia); // inserir n
 
 
 int remover(FILE* file, INDICE* indice, char* chave);
-void _remover_dado(FILE* file, int referencia);
+void _remover_dado(FILE* file, long int referencia);
 int _remover_indice(INDICE* indice, char* chave);
 int inserirFF(FILE* file, INDICE* indice, Registro* reg);
 long int _inserirFF_dado(FILE* file, Registro* reg);
-int _getFragAndPosFF(FILE* file, long int* antP, long int* atualP, long int *proxP);
+int _getFragAndPosFF(FILE* file, int sizeReg, long int* antP, long int* atualP, long int *proxP);
 void _tratarFragIntFF(FILE* file, int fragInt, int sizeReg, long int* atual, long int* prox);
 void _inserirFF_indice(INDICE* indice, char* chave, long int referencia);
 

@@ -15,3 +15,6 @@
 # Precompiled Headers
 *.gch
 *.pch
+
+# Binary files
+bin/

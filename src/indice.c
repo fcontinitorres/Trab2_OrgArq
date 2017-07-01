@@ -318,10 +318,10 @@ int inserirFF(FILE* file, INDICE* indice, Registro* reg) {
     long int referencia;
 
     // inserindo registro no arquivo de dados
-    referencia = inserirFF_dado(file, reg);
+    referencia = _inserirFF_dado(file, reg);
 
     // inserindo referencia no arquivo de indice
-    inserirFF_indice(indice, reg->cnpj, referencia);
+    _inserirFF_indice(indice, reg->cnpj, referencia);
 
     return(1);
 }
@@ -343,7 +343,7 @@ long int _inserirFF_dado(FILE* file, Registro* reg){
     
     // Captura a posição (através de ant, atual e prox) na inserção interna no arquivo de dados
     // e retorna a fragmentação interna
-    fragInt = _getPosFF(file, &ant, &atual, &prox);
+    fragInt = _getFragAndPosFF(file, sizeReg, &ant, &atual, &prox);
 
     // insere no meio do arquivo, encontrou um espaço de remoção lógica
     if (fragInt != -1) {
@@ -387,7 +387,7 @@ long int _inserirFF_dado(FILE* file, Registro* reg){
     return(posInsert);
 }
 
-int _getFragAndPosFF(FILE* file, long int* antP, long int* atualP, long int *proxP){
+int _getFragAndPosFF(FILE* file, int sizeReg, long int* antP, long int* atualP, long int *proxP){
     long int ant, atual, prox;
     int encontrou = 0;
     int sizeDisp;
@@ -399,7 +399,7 @@ int _getFragAndPosFF(FILE* file, long int* antP, long int* atualP, long int *pro
     fseek (file, 0, SEEK_SET);
 
     // le a cabeça da lista de remoção (byte offset do registro topo da lista)
-    fread(atual, sizeof(long int), 1, file);
+    fread(&atual, sizeof(long int), 1, file);
 
     while (atual != -1){
 
@@ -408,6 +408,7 @@ int _getFragAndPosFF(FILE* file, long int* antP, long int* atualP, long int *pro
 
         // le o espaço disponível
         fread(&sizeDisp, sizeof(int), 1, file);
+        
         // exclui o espaço do delimitador
         sizeDisp -= sizeof(char);
 
@@ -574,7 +575,7 @@ void imprimir_indice(INDICE* indice) {
             printf("%c", indice->lista[i]->chave[j]);
         }
         // imprimir referência
-        printf("\t%d\n", indice->lista[i]->referencia);
+        printf("\t%ld\n", indice->lista[i]->referencia);
     }
 }
 
