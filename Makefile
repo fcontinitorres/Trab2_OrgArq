@@ -1,6 +1,7 @@
 all: compile run clean
 
 compile:
+	@mkdir -p bin/
 	gcc src/registro.c src/indice.c src/menu.c src/main.c -o bin/prog -g && clear
 
 run:

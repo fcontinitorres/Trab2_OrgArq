@@ -25,6 +25,7 @@ void csv2Bin(FILE *entrada, FILE *saida1, FILE *saida2, FILE *saida3) {
     int field;  // indica qual campo do arquivo está sendo lido, seus valores vão de 0 a 7
     int iField; // indica o inidice o campo que está sendo lido, seus valores vão de 0 a n
     Registro reg; // armazena um registro lido
+    long int head = -1;
 
     // atribui null aos campos variáveis para fazer realloc deles
     anularCampos(&reg);
@@ -32,6 +33,16 @@ void csv2Bin(FILE *entrada, FILE *saida1, FILE *saida2, FILE *saida3) {
     // inicializando variáveis
     field = 0;
     iField = 0;
+
+    //reseta arquivos de saida
+    fseek(saida1, 0, SEEK_SET);
+    fseek(saida2, 0, SEEK_SET);
+    fseek(saida3, 0, SEEK_SET);
+
+    // grava cabeça da lista de remoção
+    fwrite(&head, sizeof(long int), 1, saida1);
+	fwrite(&head, sizeof(long int), 1, saida2);
+    fwrite(&head, sizeof(long int), 1, saida3);
 
     // iterando sobre o arquivo lendo caracter por caracter até
     // alcançar fim de arquivo

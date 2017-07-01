@@ -52,7 +52,7 @@ INDICE* ler_indice(FILE* arquivo, INDICE* indice) {
 
     // inicializa valores para leitura
     char* CNPJ = (char*)malloc(sizeof(char) * SIZE_CNPJ + 1);
-    int referencia = 0;
+    long int referencia = 0;
 
     // inicializa índice em memória primária
     indice = (INDICE*)malloc(sizeof(INDICE));
@@ -65,9 +65,10 @@ INDICE* ler_indice(FILE* arquivo, INDICE* indice) {
         // ler CNPJ
         fread(CNPJ, SIZE_CNPJ, 1, arquivo);
         // ler referencia
-        fread(&referencia, sizeof(int), 1, arquivo);
+        fread(&referencia, sizeof(long int), 1, arquivo);
 
-        indice = inserir_indice(indice, CNPJ, referencia);
+        //indice = inserir_indice(indice, CNPJ, referencia);
+        _inserir_indice(indice, CNPJ, referencia);
 
     } while(!feof(arquivo));
 
@@ -108,6 +109,9 @@ INDICE* criar_indices(FILE *saida) {
     reg = (Registro *)malloc(sizeof(Registro));
     int byte_offset = 0; // byte offset atual
     char c = 'c'; // caracter para percorrer arquivo
+
+    //reseta arquivo de saida para o inicio dos dados
+    fseek(saida, 8, SEEK_SET);
 
     // inicializar índice
     INDICE* indice = (INDICE*)malloc(sizeof(INDICE));
@@ -255,7 +259,7 @@ int _remover_indice(INDICE* indice, char* chave) {
         cmp = strcmp(chave, indice->lista[i]->chave);
 
         if (cmp == 0){
-
+            
             // atualizando vetor de indices
             for (k=i+1; k < indice->tamanho; k++)
                 //indice->lista[k-1] = indice->lista[k];
@@ -273,7 +277,7 @@ int _remover_indice(INDICE* indice, char* chave) {
             removeu = 1;
             break;
         }
-        else if (cmp > 0)
+        else if (cmp < 0)
             break;
     }
 
@@ -286,8 +290,8 @@ int _remover_indice(INDICE* indice, char* chave) {
         * Insere um novo valor no arquivo de índices,
         * depois reordenando-o.
     Parâmetros:
-        *
-*/
+        *      
+
 INDICE* inserir_indice(INDICE* indice, char* CNPJ, int referencia) {
 
     int i;
@@ -312,6 +316,42 @@ INDICE* inserir_indice(INDICE* indice, char* CNPJ, int referencia) {
     indice = atualizar_indice(indice);
 
     return indice;
+}*/
+
+/*
+    Descrição:
+
+    Parâmetros:
+*/
+void _inserir_indice(INDICE* indice, char* chave, long int referencia){
+    int i;
+    int cmp;
+
+    for (i=0; i <= indice->tamanho; i++){
+        
+        if (i != indice->tamanho)
+            cmp = strcmp(chave, indice->lista[i]->chave);
+
+        if ((cmp < 0) || (i == indice->tamanho)) {
+
+            // alocando novo indice
+            indice->lista = (NO**)realloc(indice->lista, sizeof(NO*) * (indice->tamanho + 1));
+            indice->lista[indice->tamanho] = (NO*) malloc(sizeof(NO));
+            
+            // copiando chave e referencia para o novo indice
+            strcpy(indice->lista[indice->tamanho]->chave, chave);
+            indice->lista[indice->tamanho]->referencia = referencia;
+
+            // atualizando tamanho do indice
+            indice->tamanho++;
+
+            // reordenando indice quando necessário
+            if (i != (indice->tamanho - 1))
+                indice = atualizar_indice(indice);
+
+            break;
+        }
+    }
 }
 
 int inserirFF(FILE* file, INDICE* indice, Registro* reg) {
@@ -321,7 +361,7 @@ int inserirFF(FILE* file, INDICE* indice, Registro* reg) {
     referencia = _inserirFF_dado(file, reg);
 
     // inserindo referencia no arquivo de indice
-    _inserirFF_indice(indice, reg->cnpj, referencia);
+    _inserir_indice(indice, reg->cnpj, referencia);
 
     return(1);
 }
@@ -458,44 +498,6 @@ void _tratarFragIntFF(FILE* file, int fragInt, int sizeReg, long int* atual, lon
     }
 }
 
-/*
-    Descrição:
-
-	Parâmetros:
-*/
-void _inserirFF_indice(INDICE* indice, char* chave, long int referencia){
-    int i;
-    int k;
-    int cmp;
-    int removeu = 0;
-
-    for (i=0; i <= indice->tamanho; i++){
-        
-        if (i != indice->tamanho)
-            cmp = strcmp(chave, indice->lista[i]->chave);
-
-        if ((cmp < 0) || (i == indice->tamanho)) {
-
-            // alocando novo indica
-            indice->lista = (NO**)realloc(indice->lista, sizeof(NO*) * (indice->tamanho + 1));
-            indice->lista[indice->tamanho] = (NO*) malloc(sizeof(NO));
-            
-            // copiando chave e referencia para o novo indice
-            strcpy(indice->lista[k]->chave, chave);
-            indice->lista[k]->referencia = referencia;
-
-            // reordenando indice quando necessário
-            if (i != indice->tamanho)
-                indice = atualizar_indice(indice);
-
-            // atualizando tamanho do indice
-            indice->tamanho++;
-
-            break;
-        }
-    }
-}
-
 
 
 
@@ -555,7 +557,6 @@ INDICE* atualizar_indice(INDICE* indice) {
         indice->lista[j+1] = copiar_no(indice->lista[j+1], atual);
     }
 
-    imprimir_indice(indice);
     return indice;
 }
 
@@ -592,7 +593,7 @@ int pesquisa_indice(INDICE* indice, char* chave){
             referencia = indice->lista[i]->referencia;
             break;
         }
-        else if (cmp > 0)
+        else if (cmp < 0)
             break;
     }
 

@@ -17,9 +17,10 @@ int main() {
 	int opcao; // opção para o menu, escolhida pelo usuário
 
 	FILE *entrada, *saida1, *saida2, *saida3; // arquivos de dados
-	FILE *indice1, *indice2, *indice3; // arquivos de índice primário
+	FILE *indiceF1, *indiceF2, *indiceF3; // arquivos de índice primário
 
-    INDICE* indice = NULL; // índice em memória primária
+	// índice em memória primária
+    INDICE *indiceR1 = NULL, *indiceR2 = NULL, *indiceR3 = NULL;
 
 	// abre e verifica se os arquivos foram abertos com sucesso
 	if (!abre_saidas(&entrada, &saida1, &saida2, &saida3)) {
@@ -28,7 +29,7 @@ int main() {
 	}
 
 	// abre e valida arquivos de índice
-    if (!abre_indices(&indice1, &indice2, &indice3)) {
+    if (!abre_indices(&indiceF1, &indiceF2, &indiceF3)) {
 		printf("\nErro ao abrir arquivos de índice\n");
 		return EXIT_FAILURE;
 	}
@@ -40,21 +41,20 @@ int main() {
 	// gera arquivos de saida (binario)
 	csv2Bin(entrada, saida1, saida2, saida3);
 
-	// reseta ponteiro dos arquivos binarios
-	fseek(saida1, 0, SEEK_SET);
-	fseek(saida2, 0, SEEK_SET);
-	fseek(saida3, 0, SEEK_SET);
-
-	// gerar índice primário (em memória primária)
-	indice = criar_indices(saida1);
-
 	// fechando arquivo de entrada
 	fclose(entrada);
+
+	// gerar índice primário (em memória primária)
+	indiceR1 = criar_indices(saida1);
+	indiceR2 = criar_indices(saida2);
+	indiceR3 = criar_indices(saida3);
 
 	// interface
 	flag = 1;
 	while(flag) {
-
+		printf("\n");
+		imprimir_indice(indiceR1);
+		//printf("sizeof(long int) = %lu\n", sizeof(long int));
     	printf("\n++++++++++++++++++++++++++++++++++++++++\n");
 		printf("+                 MENU                 +\n");
 		printf("++++++++++++++++++++++++++++++++++++++++\n");
@@ -74,12 +74,12 @@ int main() {
 				break;
 
 			case 2:
-				opcao2(saida1);
+				opcao2(indiceR1, indiceR2, indiceR3, saida1, saida2, saida3);
 				break;
 
 			case 3:
 				// TODO - inserção de registro
-				opcao3();
+				opcao3(indiceR1, indiceR2, indiceR3, saida1, saida2, saida3);
 				break;
 
 			case 4:
@@ -108,9 +108,9 @@ int main() {
 	fclose(saida3);
 
 	// fechando arquivos de índice
-	fclose(indice1);
-	fclose(indice2);
-	fclose(indice3);
+	fclose(indiceF1);
+	fclose(indiceF2);
+	fclose(indiceF3);
 
 	// TODO - Destruir índices
 	// TODO - Destruir qualquer coisa alocada em heap

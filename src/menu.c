@@ -6,7 +6,28 @@ Júlia Diniz Ferreira, 9364865
 Bruno Henrique Rasteiro, 9292910
 */
 
+#include <stdio.h>
+#include <stdlib.h>
 #include "menu.h"
+#include "indice.h"
+
+
+char* readStr(int len){
+	char* str;
+	int i, count;
+
+	str = (char *) malloc(len * sizeof(char));
+
+	fgets(str, len, stdin);
+
+	for (i = 0; i < len; i++)
+		if (str[i] == '\0')
+			break;
+
+	str = (char *) realloc(str, (i+1) * sizeof(char));
+
+	return(str);
+}
 
 /*	Descrição:
 		Abre os arquivos de entrada e saída do programa
@@ -57,11 +78,34 @@ int abre_saidas(FILE **entrada, FILE **saida1, FILE **saida2, FILE **saida3) {
 		file = arquivo de saida (binário)
 */
 void opcao1(FILE *file) {
-	// lista todos os dados
+	/*// lista todos os dados
 	listarBinario(file);
 
 	// reseta ponteiro do arquivo
+	fseek(file, 0, SEEK_SET);*/
+
+	char c;
+	int size;
+	long int ref;
+
 	fseek(file, 0, SEEK_SET);
+
+	fread(&ref,  sizeof(long int), 1, file);
+	printf("HEAD'%ld'", ref);
+
+	do {
+		c = fgetc(file);
+		if (c != EOF)
+			printf("%c", c);
+
+		if (c == '@'){
+			fread(&size, sizeof(int), 1, file);
+			fread(&ref,  sizeof(long int), 1, file);
+			printf("SIZE'%d'REF'%ld'", size, ref);	
+		}
+
+	} while (c != EOF);
+
 }
 
 /*	Descrição:
@@ -69,15 +113,21 @@ void opcao1(FILE *file) {
 	Parâmetros:
 		file = arquivo de saida (binário)
 */
-void opcao2(FILE *file) {
+void opcao2(INDICE* indice1, INDICE* indice2, INDICE* indice3, FILE* saida1, FILE* saida2, FILE* saida3) {
 	char *strBusca; // valor que a busca irá usar para comparar
-	Registro *reg; // registro resultante da busca
 
 	// espera o valor da busca
 	printf("Informe o CNPJ a ser buscado: ");
-	strBusca = NULL;
-	scanf("%ms", &strBusca);
+	strBusca = readStr(SIZE_CNPJ + 1);
 
+	printf("Valor de busca = '%s'\n", strBusca);
+
+	if (remover(saida1, indice1, strBusca))
+		printf("Removido com sucesso.\n");
+	else
+		printf("Erro ao remover registro, CNPJ não encontrado.\n");
+
+/*
 	// busca
 	reg = buscaCampoCNPJ(file, strBusca);
 
@@ -96,10 +146,53 @@ void opcao2(FILE *file) {
 	fseek(file, 0, SEEK_SET);
 	free(reg);
 	free(strBusca);
+*/
 }
 
-void opcao3() {
+void opcao3(INDICE* indice1, INDICE* indice2, INDICE* indice3, FILE* saida1, FILE* saida2, FILE* saida3) {
+	Registro* reg;
+	char* str;
 
+	reg = (Registro *) malloc(sizeof(Registro));
+
+	// coletando dados do registro
+	printf("Informe o CNPJ: ");
+	str = readStr(SIZE_CNPJ + 1);
+	strcpy(reg->cnpj, str);
+	free(str);
+
+	printf("Informe a Data de Registro: ");
+	str = readStr(SIZE_DATA + 1);
+	strcpy(reg->dtReg, str);
+	free(str);
+
+	printf("Informe a Data de Cancelamento: ");
+	str = readStr(SIZE_DATA + 1);
+	strcpy(reg->dtCanc, str);
+	free(str);
+
+	printf("Informe o CNPJ da empresa auditora: ");
+	str = readStr(SIZE_CNPJ + 1);
+	strcpy(reg->cnpjAud, str);
+	free(str);
+
+	printf("Informe a razao social: ");
+	reg->razSoc = readStr(1000);
+
+	printf("Informe o nome fantasia: ");
+	reg->nomeFant = readStr(1000);
+
+	printf("Informe o motivo de cancelamento: ");
+	reg->motCanc = readStr(1000);
+
+	printf("Informe o nome da empresa auditora: ");
+	reg->nomeEmp = readStr(1000);
+
+	// inserindo
+	if (inserirFF(saida1, indice1, reg))
+		printf("Rgistro inserido com sucesso\n");
+	else
+		printf("Erro ao inserir registro. Tente novamente.\n");
 }
 
 void opcao4() {
@@ -109,3 +202,5 @@ void opcao4() {
 void opcao5() {
 
 }
+
+

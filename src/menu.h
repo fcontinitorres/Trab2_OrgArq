@@ -15,10 +15,12 @@ Bruno Henrique Rasteiro, 9292910
 
 #include <stdio.h>
 #include "registro.h"
+#include "indice.h"
+
 
 void opcao1(FILE *file);
-void opcao2(FILE *file);
-void opcao3();
+void opcao2(INDICE* indice1, INDICE* indice2, INDICE* indice3, FILE* saida1, FILE* saida2, FILE* saida3);
+void opcao3(INDICE* indice1, INDICE* indice2, INDICE* indice3, FILE* saida1, FILE* saida2, FILE* saida3);
 void opcao4();
 void opcao5();
 int abre_saidas(FILE **entrada, FILE **saida1, FILE **saida2, FILE **saida3);

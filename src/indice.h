@@ -49,7 +49,8 @@ int abre_indices(FILE** indice1, FILE** indice2, FILE** indice3);
 INDICE* ler_indice(FILE* arquivo, INDICE* indice); // ler arquivo de índice
 void escrever_indice(INDICE* indice, FILE* arquivo); // escrever arquivo de índice
 INDICE* criar_indices(FILE* saida); // gerar arquivos de índice iniciais
-INDICE* inserir_indice(INDICE* indice, char* CNPJ, int referencia); // inserir novo item no índice
+//INDICE* inserir_indice(INDICE* indice, char* CNPJ, int referencia); // inserir novo item no índice
+void _inserir_indice(INDICE* indice, char* chave, long int referencia); // inserir novo item no índice
 
 
 int remover(FILE* file, INDICE* indice, char* chave);
