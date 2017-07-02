@@ -112,7 +112,7 @@ void indices_estat(INDICE* indiceR1, INDICE* indiceR2, INDICE* indiceR3){
 		}
 	}
 	printf("%s \t// %d\n",last_chave, count);
-
+	/*
 	printf("Arquivo de Indice 2\n");
 	printf("Indice Primario \t// Quantidade\n");
 	strcpy(last_chave,indiceR2->lista[0]->chave);
@@ -128,7 +128,8 @@ void indices_estat(INDICE* indiceR1, INDICE* indiceR2, INDICE* indiceR3){
 		}
 	}
 	printf("%s \t// %d\n",last_chave, count);
-
+	*/
+	/*
 	printf("Arquivo de Indice 3\n");
 	printf("Indice Primario \t// Quantidade\n");
 	strcpy(last_chave,indiceR3->lista[0]->chave);
@@ -144,4 +145,15 @@ void indices_estat(INDICE* indiceR1, INDICE* indiceR2, INDICE* indiceR3){
 		}
 	}
 	printf("%s \t//     %d\n",last_chave, count);
+	*/
+
+	printf("\nArquivo \t\t//CNPJ \t// Byte Offset\n");
+	for(i=0;i<indiceR1->tamanho;i++){
+		printf("Registro %d\n", i+1);
+		printf("Arquivo de Indice 1 \t// %s \t// %ld\n",indiceR1->lista[i]->chave, indiceR1->lista[i]->referencia);
+		printf("Arquivo de Indice 2 \t// %s \t// %ld\n",indiceR2->lista[i]->chave, indiceR2->lista[i]->referencia);
+		printf("Arquivo de Indice 3 \t// %s \t// %ld\n",indiceR3->lista[i]->chave, indiceR3->lista[i]->referencia);
+		printf("PRESS ENTER\n");
+		scanf("%*c");
+	}
 }
