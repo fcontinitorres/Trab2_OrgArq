@@ -5,16 +5,15 @@ Felipe Contini Torres, 9253670
 Júlia Diniz Ferreira, 9364865
 Bruno Henrique Rasteiro, 9292910
 */
+
 #include "estatistica.h"
 
 void listarRemovidos(FILE *file) {
 	
 	long int head;
-	long int offset;
-
+	long int next;
 	int regCounter = 0;
 	int size;
-	long int next;
 
 	// salva posicao atual do arquivo para o usuario nao notar as alteracoes feitas
 	long int filePos = ftell(file);
@@ -55,13 +54,13 @@ void listarRemovidos(FILE *file) {
 		regCounter++;
 		
 		// Le o tamanho do registro
-		fread(&size, sizeof(int), file);
+		fread(&size, sizeof(int), 1, file);
 
 		// Imprime o byte offset do registro e seu tamanho
 		fprintf(stderr, "Offset: %-6ld\t Tamanho: %-4d\n", ftell(file), size);
 		
 		// Le o byte offset do próximo registro
-		fread(&next, sizeof(long int), file);
+		fread(&next, sizeof(long int), 1, file);
 
 		// vai pro próximo da lista
 		fseek(file, next, SEEK_SET);

@@ -87,8 +87,7 @@ int main() {
 				break;
 
 			case 5:
-				// TODO - estatísticas remoções
-				opcao5();
+				opcao5(saida1, saida2, saida3);
 				break;
 
 			case 6:

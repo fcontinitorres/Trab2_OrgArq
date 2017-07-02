@@ -206,8 +206,16 @@ void opcao4(INDICE* indice1, INDICE* indice2, INDICE* indice3) {
 	indices_estat(indice1, indice2, indice3);
 }
 
-void opcao5() {
-
+void opcao5(FILE *file1, FILE *file2, FILE *file3) {
+	printf("Lista de removidos do primeiro arquivo\n");
+	getchar();
+	listarRemovidos(file1);
+	printf("Lista de removidos do segundo arquivo\n");
+	getchar();
+	listarRemovidos(file2);
+	printf("Lista de removidos do terceiro arquivo\n");
+	getchar();
+	listarRemovidos(file3);
 }
 
 

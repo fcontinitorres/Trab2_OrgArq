@@ -14,7 +14,8 @@ Bruno Henrique Rasteiro, 9292910
 
 #include "indice.h"
 
+void listarRemovidos(FILE *file);
+int quant_entradas(Registro *reg);
 void indices_estat(INDICE* indiceR1, INDICE* indiceR2, INDICE* indiceR3);
-
 
 #endif //ESTATISTICA_H
