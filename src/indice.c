@@ -236,7 +236,7 @@ void _remover_dado(FILE* file, long int referencia){
     } while (c != DEL_REG);
     
     // fseek até o inicio do registro a ser deletado
-    fseek (file, referencia, SEEK_SET);
+    fseek(file, referencia, SEEK_SET);
 
     // grava o caracter de exclusão lógica
     fwrite(&exc_log, sizeof(char), 1, file);
