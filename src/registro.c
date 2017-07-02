@@ -151,6 +151,7 @@ void salvarRegistro(Registro *reg, FILE *file) {
 
 	// grava todos os campos
 	salvarCampo(reg, file);
+
 	// grava o delimitador de registros
 	fwrite(&delReg, sizeof(char), 1, file);
 }
@@ -229,14 +230,32 @@ void listarBinario(FILE *file) {
 	int field; // campo que está sendo lido (0 a 7)
 	int iField;	// indice do campo que está sendo lido
 	char c;	// carácter que irá percorrer todo o arquivo
+	int sizeField;
+	long int head;
 
 	// inicializando variáveis
 	field = 0;
 	iField = 0;
 	anularCampos(&reg);
 
+	// fseek para o inicio do arquivo
+	fseek(file, 0, SEEK_SET);
+	// le a cabeça da lista de removidos
+	fread(&head, sizeof(long int), 1, file);
+
     // leitura do arquivo até chegar em EOF
 	do {
+
+		// verifica se o campo esta logicamente removido
+		fread(&c, sizeof(char), 1, file);
+		if (c == EXC_LOG){
+			//le o tamanho do registro deletado e pula ele
+			fread(&sizeField, sizeof(int), 1, file);
+			fseek(file, sizeField - sizeof(int), SEEK_CUR);
+		}
+		else
+			fseek(file, -sizeof(char), SEEK_CUR);
+
 		// lê campos de tamanho fixo do
 		// arquivo para o registro Reg
 		fread(&reg.cnpj, sizeof(char), SIZE_CNPJ, file);

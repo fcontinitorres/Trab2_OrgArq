@@ -170,11 +170,18 @@ INDICE* criar_indices(FILE *saida) {
 
 }
 
+/*  Descrição:
+        
+    Parâmetros:
+        
+    Retorno:
+        
+*/
 int remover(FILE* file, INDICE* indice, char* chave){
     long int referencia;
 
     // pesquisa referência do registro no arquivo de índice
-    referencia = pesquisa_indice(indice, chave);
+    referencia = _pesquisa_indice(indice, chave);
 
     // se o registro existe
     if (referencia != -1) {
@@ -323,35 +330,28 @@ INDICE* inserir_indice(INDICE* indice, char* CNPJ, int referencia) {
 
     Parâmetros:
 */
-void _inserir_indice(INDICE* indice, char* chave, long int referencia){
+void _inserir_indice(INDICE* indice, char* chave, long int referencia) {
+
     int i;
-    int cmp;
 
-    for (i=0; i <= indice->tamanho; i++){
-        
-        if (i != indice->tamanho)
-            cmp = strcmp(chave, indice->lista[i]->chave);
+    // salvar em novo nó na lista de índices
+    indice->lista = (NO**)realloc(indice->lista, sizeof(NO*) * indice->tamanho + 1);
+    indice->lista[indice->tamanho] = (NO*)malloc(sizeof(NO));
 
-        if ((cmp < 0) || (i == indice->tamanho)) {
-
-            // alocando novo indice
-            indice->lista = (NO**)realloc(indice->lista, sizeof(NO*) * (indice->tamanho + 1));
-            indice->lista[indice->tamanho] = (NO*) malloc(sizeof(NO));
-            
-            // copiando chave e referencia para o novo indice
-            strcpy(indice->lista[indice->tamanho]->chave, chave);
-            indice->lista[indice->tamanho]->referencia = referencia;
-
-            // atualizando tamanho do indice
-            indice->tamanho++;
-
-            // reordenando indice quando necessário
-            if (i != (indice->tamanho - 1))
-                indice = atualizar_indice(indice);
-
-            break;
-        }
+    // copiar CNPJ para o novo nó de índice
+    for (i = 0; i < SIZE_CNPJ + 1; i++) {
+        indice->lista[indice->tamanho]->chave[i] = chave[i];
     }
+    indice->lista[indice->tamanho]->chave[SIZE_CNPJ] = '\0';
+
+    // salvar referência desse CNPJ
+    indice->lista[indice->tamanho]->referencia = referencia;
+
+    // aumentar contador da lista de índices
+    indice->tamanho += 1;
+
+    // reordenar (insertion sort rápido para lista quase ordenada)
+    indice = atualizar_indice(indice);
 }
 
 int inserirFF(FILE* file, INDICE* indice, Registro* reg) {
@@ -380,6 +380,7 @@ long int _inserirFF_dado(FILE* file, Registro* reg){
     sizeReg += strlen(reg->nomeFant);
     sizeReg += strlen(reg->motCanc);
     sizeReg += strlen(reg->nomeEmp);
+    sizeReg += sizeof(char) * 4; // delimitadores de campo
     
     // Captura a posição (através de ant, atual e prox) na inserção interna no arquivo de dados
     // e retorna a fragmentação interna
@@ -430,7 +431,7 @@ long int _inserirFF_dado(FILE* file, Registro* reg){
 int _getFragAndPosFF(FILE* file, int sizeReg, long int* antP, long int* atualP, long int *proxP){
     long int ant, atual, prox;
     int encontrou = 0;
-    int sizeDisp;
+    int sizeRegDisp;
 
     // anterior ao inicio da lista
     ant = -1;
@@ -444,19 +445,16 @@ int _getFragAndPosFF(FILE* file, int sizeReg, long int* antP, long int* atualP, 
     while (atual != -1){
 
         // fseek para a area de inserção
-        fseek (file, atual + sizeof(char), SEEK_SET);
+        fseek(file, atual + sizeof(char), SEEK_SET);
 
-        // le o espaço disponível
-        fread(&sizeDisp, sizeof(int), 1, file);
+        // le o espaço disponível para um novo registro
+        fread(&sizeRegDisp, sizeof(int), 1, file);
         
-        // exclui o espaço do delimitador
-        sizeDisp -= sizeof(char);
-
         // le qual é o próximo registro da lista
         fread(&prox, sizeof(long int), 1, file);
 
         // se tem espaço suficiente para o registro
-        if (sizeReg <= sizeDisp){
+        if (sizeReg <= sizeRegDisp){
             encontrou = 1;
             break;
         }
@@ -471,8 +469,8 @@ int _getFragAndPosFF(FILE* file, int sizeReg, long int* antP, long int* atualP, 
     *proxP = prox;
 
     if (encontrou)
-        // retorna a framgmentação interna
-        return(sizeDisp - sizeReg);
+        // retorna a framgmentação interna (sizeof(char) == espaço ocupado pelo delimitador de registro)
+        return(sizeRegDisp - (sizeReg + sizeof(char)));
     else
         return(-1);
 }
@@ -490,15 +488,13 @@ void _tratarFragIntFF(FILE* file, int fragInt, int sizeReg, long int* atual, lon
         // grava o tamanho da fragmentação interna
         fwrite(&fragInt, sizeof(int), 1, file);
 
-        // grava o byte ofssfrag - delimitadorfrag - delimitadoret do próximo registro removido
+        // grava o byte offset do próximo registro removido
         fwrite(prox, sizeof(long int), 1, file);
 
         // atribuição para que o próximo do anterior seja a fragmentação interna
         *prox = *atual + sizeReg + sizeof(char);
     }
 }
-
-
 
 
 /*
@@ -580,7 +576,7 @@ void imprimir_indice(INDICE* indice) {
     }
 }
 
-int pesquisa_indice(INDICE* indice, char* chave){
+int _pesquisa_indice(INDICE* indice, char* chave){
     int i;
     int cmp;
     long int referencia = -1;

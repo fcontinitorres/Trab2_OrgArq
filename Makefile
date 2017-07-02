@@ -5,7 +5,7 @@ compile:
 	gcc src/registro.c src/indice.c src/menu.c src/main.c -o bin/prog -g && clear
 
 run:
-	./bin/prog
+	@./bin/prog
 
 memcheck:
 	valgrind -v --leak-check=full --show-leak-kinds=all --read-var-info=yes --track-origins=yes ./bin/prog

@@ -17,5 +17,5 @@
 *.pch
 
 # Binary files
-bin/
+bin/*
 out/*

@@ -80,11 +80,13 @@ int abre_saidas(FILE **entrada, FILE **saida1, FILE **saida2, FILE **saida3) {
 		file = arquivo de saida (binário)
 */
 void opcao1(FILE *file) {
-	/*// lista todos os dados
+	// lista todos os dados
 	listarBinario(file);
-
 	// reseta ponteiro do arquivo
-	fseek(file, 0, SEEK_SET);*/
+	fseek(file, 0, SEEK_SET);
+
+
+/* Eu (bruno) estava usando esse print do arquivo todo para testar a inserção(FF) e remoção
 
 	char c;
 	int size;
@@ -93,7 +95,7 @@ void opcao1(FILE *file) {
 	fseek(file, 0, SEEK_SET);
 
 	fread(&ref,  sizeof(long int), 1, file);
-	printf("HEAD'%ld'", ref);
+	printf("HEAD = %ld\n", ref);
 
 	do {
 		c = fgetc(file);
@@ -103,11 +105,11 @@ void opcao1(FILE *file) {
 		if (c == '@'){
 			fread(&size, sizeof(int), 1, file);
 			fread(&ref,  sizeof(long int), 1, file);
-			printf("SIZE'%d'REF'%ld'", size, ref);	
+			printf("'%d'%ld'", size, ref);	
 		}
 
 	} while (c != EOF);
-
+*/
 }
 
 /*	Descrição:
@@ -122,10 +124,8 @@ void opcao2(INDICE* indice1, INDICE* indice2, INDICE* indice3, FILE* saida1, FIL
 	printf("Informe o CNPJ a ser buscado: ");
 	strBusca = readStr(SIZE_CNPJ + 1);
 
-	printf("Valor de busca = '%s'\n", strBusca);
-
 	if (remover(saida1, indice1, strBusca))
-		printf("Removido com sucesso.\n");
+		printf("Registro removido com sucesso.\n");
 	else
 		printf("Erro ao remover registro, CNPJ não encontrado.\n");
 
@@ -163,54 +163,36 @@ void opcao3(INDICE* indice1, INDICE* indice2, INDICE* indice3, FILE* saida1, FIL
 	strcpy(reg->cnpj, str);
 	getchar();
 	free(str);
-	printf("CNPJ = '%s'", reg->cnpj);
-
+	
 	printf("Informe a Data de Registro: ");
 	str = readStr(SIZE_DATA + 1);
 	strcpy(reg->dtReg, str);
 	getchar();
 	free(str);
-	printf("DtReg = '%s'", reg->dtReg);
-
-
 
 	printf("Informe a Data de Cancelamento: ");
 	str = readStr(SIZE_DATA + 1);
 	strcpy(reg->dtCanc, str);
 	getchar();
 	free(str);
-	printf("DtCanc = '%s'", reg->dtCanc);
-
 
 	printf("Informe o CNPJ da empresa auditora: ");
 	str = readStr(SIZE_CNPJ + 1);
 	strcpy(reg->cnpjAud, str);
 	getchar();
 	free(str);
-	printf("CNPJ Aud = '%s'", reg->cnpjAud);
-
 
 	printf("Informe a razao social: ");
 	reg->razSoc = readStr(1000);
-	printf("RazSocial = '%s'", reg->razSoc);
-
 
 	printf("Informe o nome fantasia: ");
 	reg->nomeFant = readStr(1000);
-	printf("nomeFant = '%s'", reg->nomeFant);
-
-
 
 	printf("Informe o motivo de cancelamento: ");
 	reg->motCanc = readStr(1000);
-	printf("motCanc = '%s'", reg->motCanc);
-
-
 
 	printf("Informe o nome da empresa auditora: ");
 	reg->nomeEmp = readStr(1000);
-	printf("nomeEmp = '%s'", reg->nomeEmp);
-
 
 	// inserindo
 	if (inserirFF(saida1, indice1, reg))

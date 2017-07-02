@@ -54,8 +54,7 @@ int main() {
 	while(flag) {
 		printf("\n");
 		imprimir_indice(indiceR1);
-		//printf("sizeof(long int) = %lu\n", sizeof(long int));
-    	printf("\n++++++++++++++++++++++++++++++++++++++++\n");
+		printf("\n++++++++++++++++++++++++++++++++++++++++\n");
 		printf("+                 MENU                 +\n");
 		printf("++++++++++++++++++++++++++++++++++++++++\n");
     	printf("1 - Listar todos os registros\n");

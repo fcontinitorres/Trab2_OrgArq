@@ -67,7 +67,7 @@ NO* copiar_no(NO* a, NO* b); // auxiliar para ordenação
 long int converter_CNPJ(char* CNPJ);
 INDICE* atualizar_indice(INDICE* indice); // reordenar
 void imprimir_indice(INDICE* indice); // imprime estrutura de índice completa
-int pesquisa_indice(INDICE* indice, char* chave);
+int _pesquisa_indice(INDICE* indice, char* chave);
 void destruir_indice(INDICE**); // desalocar
 
 #endif
