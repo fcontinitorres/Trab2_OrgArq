@@ -83,7 +83,7 @@ int main() {
 
 			case 4:
 				// TODO - estatísticas índices
-				opcao4();
+				opcao4(indiceR1, indiceR2, indiceR3);
 				break;
 
 			case 5:
