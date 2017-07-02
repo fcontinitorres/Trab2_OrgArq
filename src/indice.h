@@ -41,33 +41,39 @@ typedef struct indice {
 
 } INDICE;
 
-/********************************************//**
- *  Funções para criação e manipulação de índices
- ***********************************************/
-
+//***************************************************//
+//*  Funções para criação e manipulação de índices  *//
+//***************************************************//
 int abre_indices(FILE** indice1, FILE** indice2, FILE** indice3);
 INDICE* ler_indice(FILE* arquivo, INDICE* indice); // ler arquivo de índice
 void escrever_indice(INDICE* indice, FILE* arquivo); // escrever arquivo de índice
 INDICE* criar_indices(FILE* saida); // gerar arquivos de índice iniciais
-//INDICE* inserir_indice(INDICE* indice, char* CNPJ, int referencia); // inserir novo item no índice
 void _inserir_indice(INDICE* indice, char* chave, long int referencia); // inserir novo item no índice
+INDICE* atualizar_indice(INDICE* indice); // reordenar
+void imprimir_indice(INDICE* indice); // imprime estrutura de índice completa
+long int _pesquisa_indice(INDICE* indice, char* chave);
+void destruir_indice(INDICE**); // desalocar
 
-
+//*************************//
+//* FUNÇÕES PARA REMOÇÃO  *//
+//*************************//
 int remover(FILE* file, INDICE* indice, char* chave);
 void _remover_dado(FILE* file, long int referencia);
 int _remover_indice(INDICE* indice, char* chave);
+
+//**************************//
+//* FUNÇÕES PARA INSERÇÃO  *//
+//**************************//
 int inserirFF(FILE* file, INDICE* indice, Registro* reg);
 long int _inserirFF_dado(FILE* file, Registro* reg);
 int _getFragAndPosFF(FILE* file, int sizeReg, long int* antP, long int* atualP, long int *proxP);
 void _tratarFragIntFF(FILE* file, int fragInt, int sizeReg, long int* atual, long int* prox);
 void _inserirFF_indice(INDICE* indice, char* chave, long int referencia);
 
-
+//************************//
+//* FUNÇÕES UTILITÁRIAS  *//
+//************************//
 NO* copiar_no(NO* a, NO* b); // auxiliar para ordenação
 long int converter_CNPJ(char* CNPJ);
-INDICE* atualizar_indice(INDICE* indice); // reordenar
-void imprimir_indice(INDICE* indice); // imprime estrutura de índice completa
-int _pesquisa_indice(INDICE* indice, char* chave);
-void destruir_indice(INDICE**); // desalocar
 
 #endif

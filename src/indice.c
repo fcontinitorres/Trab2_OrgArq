@@ -170,11 +170,141 @@ INDICE* criar_indices(FILE *saida) {
 
 }
 
-/*  Descrição:
-        
+/*
+    Descrição:
+        Insere um índice do índice em RAM,
+        reorganizando em seguida.
     Parâmetros:
-        
+        indice = ponteiro para o índice em RAM
+        chave = string (CNPJ) para a inserção
+        referencia = byte offset do registro (no arquivo de dados)
+*/
+void _inserir_indice(INDICE* indice, char* chave, long int referencia) {
+
+    int i;
+
+    // salvar em novo nó na lista de índices
+    indice->lista = (NO**)realloc(indice->lista, sizeof(NO*) * indice->tamanho + 1);
+    indice->lista[indice->tamanho] = (NO*)malloc(sizeof(NO));
+
+    // copiar CNPJ para o novo nó de índice
+    for (i = 0; i < SIZE_CNPJ + 1; i++) {
+        indice->lista[indice->tamanho]->chave[i] = chave[i];
+    }
+    indice->lista[indice->tamanho]->chave[SIZE_CNPJ] = '\0';
+
+    // salvar referência desse CNPJ
+    indice->lista[indice->tamanho]->referencia = referencia;
+
+    // aumentar contador da lista de índices
+    indice->tamanho += 1;
+
+    // reordenar (insertion sort rápido para lista quase ordenada)
+    indice = atualizar_indice(indice);
+}
+
+/*
+    Descrição:
+        * Reordena arquivo de índices após inserção/remoção.
+    Parâmetros:
+        * indice = arquivo de índice primário a ser reorganizado
+*/
+INDICE* atualizar_indice(INDICE* indice) {
+    int i, j;
+
+    NO* atual = (NO*)malloc(sizeof(NO));
+
+    for (i = 1; i < indice->tamanho; i++) {
+        atual = copiar_no(atual, indice->lista[i]);
+        j = i - 1;
+        while ((j >= 0) && (converter_CNPJ(indice->lista[j]->chave) > converter_CNPJ(atual->chave))) {
+            indice->lista[j+1] = copiar_no(indice->lista[j+1], indice->lista[j]);
+            j--;
+        }
+        indice->lista[j+1] = copiar_no(indice->lista[j+1], atual);
+    }
+
+    return indice;
+}
+
+/*
+    Descrição:
+        * Imprime índice de forma tabelada
+    Parâmetros:
+        * indice = índice em memória primária que será exibido
+*/
+void imprimir_indice(INDICE* indice) {
+    int i, j;
+    printf("[ÍNDICE]\t[CNPJ]\t\t\t[BYTE OFFSET]\n");
+    for (i = 0; i < indice->tamanho; i++) {
+        printf("ÍNDICE [%d]\t", i);
+        // imprimir CNPJ
+        for (j = 0; j < SIZE_CNPJ; j++) {
+            printf("%c", indice->lista[i]->chave[j]);
+        }
+        // imprimir referência
+        printf("\t%ld\n", indice->lista[i]->referencia);
+    }
+}
+
+/*
+    Descrição:
+        Pesquisa por um CNPJ no indice em RAM 
+    Parâmetros:
+        indice = indice em RAM
+        chave = chave de busca (CNPJ)
     Retorno:
+        Retorna a referencia (byte offset) do registro
+*/
+long int _pesquisa_indice(INDICE* indice, char* chave){
+    int i;
+    int cmp;
+    long int referencia = -1;
+
+    for (i=0; i < indice->tamanho; i++){
+        cmp = strcmp(chave, indice->lista[i]->chave);
+
+        if (cmp == 0){
+            // salvando referencia para retornar
+            referencia = indice->lista[i]->referencia;
+            break;
+        }
+        else if (cmp < 0)
+            break;
+    }
+
+    return(referencia);
+}
+
+/*
+    Descrição:
+        * Destrói índice da memória primária
+    Parâmetros:
+        * indice = a ser destruído
+*/
+void destruir_indice(INDICE** indice) {
+    int i;
+    for (i = 0; i < (*indice)->tamanho; i++) {
+        free((*indice)->lista[i]);
+        (*indice)->lista[i] = NULL;
+    }
+    free((*indice)->lista);
+    (*indice)->lista = NULL;
+
+    free((*indice));
+    (*indice) = NULL;
+
+}
+
+/*  Descrição:
+        Remoção de um registro, a remoção ocorre tanto no arquivo de dados
+        quanto no indice em memória.        
+    Parâmetros:
+        file = arquivo de dados
+        indice = ponteiro para o indice em memória ram
+        chave = string de busca         
+    Retorno:
+        Retorna o resultado da remoção, 1 para removido, 0 para não removido
         
 */
 int remover(FILE* file, INDICE* indice, char* chave){
@@ -200,9 +330,10 @@ int remover(FILE* file, INDICE* indice, char* chave){
 
 /*
     Descrição:
-        * Remove um ,
-        * reorganizando em seguida.
+        Remove um registro do arquivo de dados 
     Parâmetros:
+        file = arquivo de dados
+        referencia = byte offset do registro a ser removido
 */
 void _remover_dado(FILE* file, long int referencia){
     char exc_log = EXC_LOG; 
@@ -250,11 +381,14 @@ void _remover_dado(FILE* file, long int referencia){
 
 /*
     Descrição:
-        * Remove um índice do índice em RAM,
-        * reorganizando em seguida.
+        Remove um índice do índice em RAM,
+        reorganizando em seguida caso necessário.
     Parâmetros:
-        * indice = ponteiro para o índice em RAM
-        * chave = chave (string) de busca para a remoção
+        indice = ponteiro para o índice em RAM
+        chave = string (CNPJ) de busca para a remoção
+    Retorno:
+        Retorna 1 caso a remoção seja bem sucedida, 
+        0 caso a chave não seja localizada
 */
 int _remover_indice(INDICE* indice, char* chave) {
     int i;
@@ -292,68 +426,18 @@ int _remover_indice(INDICE* indice, char* chave) {
 }
 
 
-/*
-    Descrição:
-        * Insere um novo valor no arquivo de índices,
-        * depois reordenando-o.
-    Parâmetros:
-        *      
-
-INDICE* inserir_indice(INDICE* indice, char* CNPJ, int referencia) {
-
-    int i;
-
-    // salvar em novo nó na lista de índices
-    indice->lista = (NO**)realloc(indice->lista, sizeof(NO*) * indice->tamanho + 1);
-    indice->lista[indice->tamanho] = (NO*)malloc(sizeof(NO));
-
-    // copiar CNPJ para o novo nó de índice
-    for (i = 0; i < SIZE_CNPJ + 1; i++) {
-        indice->lista[indice->tamanho]->chave[i] = CNPJ[i];
-    }
-    indice->lista[indice->tamanho]->chave[SIZE_CNPJ] = '\0';
-
-    // salvar referência desse CNPJ
-    indice->lista[indice->tamanho]->referencia = referencia;
-
-    // aumentar contador da lista de índices
-    indice->tamanho += 1;
-
-    // reordenar (insertion sort rápido para lista quase ordenada)
-    indice = atualizar_indice(indice);
-
-    return indice;
-}*/
 
 /*
     Descrição:
-
+        Insere um registro seguindo a técnica First Fit
     Parâmetros:
+        file = arquivo de dados
+        indice = ponteiro para o índice em RAM
+        reg = registro a ser inserido
+    Retorno:
+        Retorna 1 caso a inserção seja bem sucedida, 
+        0 caso contrario
 */
-void _inserir_indice(INDICE* indice, char* chave, long int referencia) {
-
-    int i;
-
-    // salvar em novo nó na lista de índices
-    indice->lista = (NO**)realloc(indice->lista, sizeof(NO*) * indice->tamanho + 1);
-    indice->lista[indice->tamanho] = (NO*)malloc(sizeof(NO));
-
-    // copiar CNPJ para o novo nó de índice
-    for (i = 0; i < SIZE_CNPJ + 1; i++) {
-        indice->lista[indice->tamanho]->chave[i] = chave[i];
-    }
-    indice->lista[indice->tamanho]->chave[SIZE_CNPJ] = '\0';
-
-    // salvar referência desse CNPJ
-    indice->lista[indice->tamanho]->referencia = referencia;
-
-    // aumentar contador da lista de índices
-    indice->tamanho += 1;
-
-    // reordenar (insertion sort rápido para lista quase ordenada)
-    indice = atualizar_indice(indice);
-}
-
 int inserirFF(FILE* file, INDICE* indice, Registro* reg) {
     long int referencia;
 
@@ -366,6 +450,15 @@ int inserirFF(FILE* file, INDICE* indice, Registro* reg) {
     return(1);
 }
 
+/*
+    Descrição:
+        Insere um registro no arquivo de dados seguindo a técnica First Fit
+    Parâmetros:
+        file = arquivo de dados
+        reg = registro a ser inserido
+    Retorno:
+        Retorna o byte offset do registro no arquivo de dados
+*/
 long int _inserirFF_dado(FILE* file, Registro* reg){
     int sizeReg;
     int fragInt;
@@ -428,6 +521,21 @@ long int _inserirFF_dado(FILE* file, Registro* reg){
     return(posInsert);
 }
 
+/*
+    Descrição:
+        Verifica se o espaço que sobrou na inserção de um arquivo (a fragmentação interna),
+        pode ser adicionada a lista de excluidos.
+        Obs: Ela não poderá ser adiciona caso não seja grande o suficiente para caber,
+        os campos 
+    Parâmetros:
+        file = arquivo de dados
+        sizeReg = tamanho do registro (não inclui o delimitador de registros)
+        antP = byte offset anterir na lista de removidos
+        atualP = byte offset atual na lista de removidos
+        proxP = próximo byte offset na lista de removidos 
+    Retorno:
+        Retorna a fragmentação interna ocasionada pela inserção
+*/
 int _getFragAndPosFF(FILE* file, int sizeReg, long int* antP, long int* atualP, long int *proxP){
     long int ant, atual, prox;
     int encontrou = 0;
@@ -475,12 +583,28 @@ int _getFragAndPosFF(FILE* file, int sizeReg, long int* antP, long int* atualP, 
         return(-1);
 }
 
+/*
+    Descrição:
+        Verifica se o espaço que sobrou na inserção de um arquivo (a fragmentação interna),
+        pode ser adicionada a lista de excluidos.
+        Obs: Ela não poderá ser adiciona caso não seja grande o suficiente para caber,
+        o caracter de remoceção lógica, o tamanho da fragmentação, o byte offset do próximo
+        item da lista e o caracter delimitador de registro (deve caber o delimitador pois ele
+        não está incluso no cálculo da fragmentação, ou seja, esse valor da fragmentação indica
+        o tamanho do registro que pode ser salvo nesse espaço)
+    Parâmetros:
+        file = arquivo de dados
+        fragInt = fragmentação interna (não inclui o delimitador de registros)
+        sizeReg = tamanho do registro (não inclui o delimitador de registros)
+        atual = byte offset atual na lista de removidos
+        prox = próximo byte offset na lista de removidos
+*/
 void _tratarFragIntFF(FILE* file, int fragInt, int sizeReg, long int* atual, long int* prox){
     char exc_log = EXC_LOG;
     char del_reg = DEL_REG;
 
     // verifica se é possível adicionar a fragmentação interna a lista de excluidos
-    if (fragInt >= (sizeof(char) + sizeof(int) + sizeof(long int))) {
+    if (fragInt >= (sizeof(char) + sizeof(int) + sizeof(long int) + sizeof(char))) {
 
         // grava o caracter de exclusão lógica
         fwrite(&exc_log, sizeof(char), 1, file);
@@ -532,86 +656,3 @@ long int converter_CNPJ(char* CNPJ) {
     return convertido;
 }
 
-/*
-    Descrição:
-        * Reordena arquivo de índices após inserção/remoção.
-    Parâmetros:
-        * indice = arquivo de índice primário a ser reorganizado
-*/
-INDICE* atualizar_indice(INDICE* indice) {
-    int i, j;
-
-    NO* atual = (NO*)malloc(sizeof(NO));
-
-    for (i = 1; i < indice->tamanho; i++) {
-        atual = copiar_no(atual, indice->lista[i]);
-        j = i - 1;
-        while ((j >= 0) && (converter_CNPJ(indice->lista[j]->chave) > converter_CNPJ(atual->chave))) {
-            indice->lista[j+1] = copiar_no(indice->lista[j+1], indice->lista[j]);
-            j--;
-        }
-        indice->lista[j+1] = copiar_no(indice->lista[j+1], atual);
-    }
-
-    return indice;
-}
-
-/*
-    Descrição:
-		* Imprime índice de forma tabelada
-	Parâmetros:
-        * indice = índice em memória primária que será exibido
-*/
-void imprimir_indice(INDICE* indice) {
-    int i, j;
-    printf("[ÍNDICE]\t[CNPJ]\t\t\t[BYTE OFFSET]\n");
-    for (i = 0; i < indice->tamanho; i++) {
-        printf("ÍNDICE [%d]\t", i);
-        // imprimir CNPJ
-        for (j = 0; j < SIZE_CNPJ; j++) {
-            printf("%c", indice->lista[i]->chave[j]);
-        }
-        // imprimir referência
-        printf("\t%ld\n", indice->lista[i]->referencia);
-    }
-}
-
-int _pesquisa_indice(INDICE* indice, char* chave){
-    int i;
-    int cmp;
-    long int referencia = -1;
-
-    for (i=0; i < indice->tamanho; i++){
-        cmp = strcmp(chave, indice->lista[i]->chave);
-
-        if (cmp == 0){
-            // salvando referencia para retornar
-            referencia = indice->lista[i]->referencia;
-            break;
-        }
-        else if (cmp < 0)
-            break;
-    }
-
-    return(referencia);
-}
-
-/*
-    Descrição:
-		* Destrói índice da memória primária
-	Parâmetros:
-        * indice = a ser destruído
-*/
-void destruir_indice(INDICE** indice) {
-    int i;
-    for (i = 0; i < (*indice)->tamanho; i++) {
-        free((*indice)->lista[i]);
-        (*indice)->lista[i] = NULL;
-    }
-    free((*indice)->lista);
-    (*indice)->lista = NULL;
-
-    free((*indice));
-    (*indice) = NULL;
-
-}
