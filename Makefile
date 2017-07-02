@@ -8,7 +8,7 @@ compile:
 run:
 	@./bin/prog
 
-memcheck:
+memcheck: compile
 	valgrind -v --leak-check=full --show-leak-kinds=all --read-var-info=yes --track-origins=yes ./bin/prog
 
 debug:

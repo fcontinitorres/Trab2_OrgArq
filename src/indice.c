@@ -115,7 +115,7 @@ INDICE* criar_indices(FILE *saida) {
 
     // inicializar índice
     INDICE* indice = (INDICE*)malloc(sizeof(INDICE));
-    indice->lista = (NO**)malloc(sizeof(NO**));
+    indice->lista = (NO**)malloc(sizeof(NO*));
     indice->tamanho = 0;
 
     // percorrer arquivo binário
@@ -131,7 +131,7 @@ INDICE* criar_indices(FILE *saida) {
         fread(&reg->cnpj,sizeof(char),SIZE_CNPJ,saida);
 
         // salvar em novo nó na lista de índices
-        indice->lista = (NO**)realloc(indice->lista, sizeof(NO*) * indice->tamanho + 1);
+        indice->lista = (NO**)realloc(indice->lista, sizeof(NO*) * (indice->tamanho + 1));
         indice->lista[indice->tamanho] = (NO*)malloc(sizeof(NO));
         indice->lista[indice->tamanho]->referencia = 0;
 
