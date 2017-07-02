@@ -10,6 +10,7 @@ Bruno Henrique Rasteiro, 9292910
 #include <stdlib.h>
 #include "menu.h"
 #include "indice.h"
+#include "estatistica.h"
 
 
 char* readStr(int len){
@@ -201,8 +202,8 @@ void opcao3(INDICE* indice1, INDICE* indice2, INDICE* indice3, FILE* saida1, FIL
 		printf("Erro ao inserir registro. Tente novamente.\n");
 }
 
-void opcao4() {
-
+void opcao4(INDICE* indice1, INDICE* indice2, INDICE* indice3) {
+	indices_estat(indice1, indice2, indice3);
 }
 
 void opcao5() {

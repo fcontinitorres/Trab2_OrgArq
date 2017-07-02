@@ -3,7 +3,7 @@ all: compile run clean
 compile:
 	@mkdir -p bin/
 	@mkdir -p out/
-	gcc src/registro.c src/indice.c src/menu.c src/main.c -o bin/prog -g && clear
+	gcc src/registro.c src/indice.c src/estatistica.c src/menu.c src/main.c -o bin/prog -g && clear
 
 run:
 	@./bin/prog
