@@ -220,6 +220,7 @@ void _remover_dado(FILE* file, long int referencia){
     fseek (file, 0, SEEK_SET);
 
     // atualiza a lista de remoção
+    fprintf(stderr, "ATUALIZANDO HEAD: %ld\n", referencia);
     fwrite(&referencia, sizeof(long int), 1, file);
 
     // soma o tamanho dos campos fixos
@@ -238,11 +239,17 @@ void _remover_dado(FILE* file, long int referencia){
     // fseek até o inicio do registro a ser deletado
     fseek(file, referencia, SEEK_SET);
 
+    fprintf(stderr, "GRAVANDO EXC_LOG EM %ld\n", ftell(file));
+    
     // grava o caracter de exclusão lógica
     fwrite(&exc_log, sizeof(char), 1, file);
 
+    fprintf(stderr, "GRAVANDO TAM REG EM %ld: %d\n", ftell(file), sizeReg);
+
     // grava o tamanho do registro
     fwrite(&sizeReg, sizeof(int), 1, file);
+
+    fprintf(stderr, "GRAVANDO HEAD EM %ld: %ld\n", ftell(file), head);
 
     // grava o byte ofsset do próximo registro removido (antiga cabeça da lista)
     fwrite(&head, sizeof(long int), 1, file);
@@ -477,7 +484,6 @@ int _getFragAndPosFF(FILE* file, int sizeReg, long int* antP, long int* atualP, 
 
 void _tratarFragIntFF(FILE* file, int fragInt, int sizeReg, long int* atual, long int* prox){
     char exc_log = EXC_LOG;
-    char del_reg = DEL_REG;
 
     // verifica se é possível adicionar a fragmentação interna a lista de excluidos
     if (fragInt >= (sizeof(char) + sizeof(int) + sizeof(long int))) {
