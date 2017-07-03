@@ -20,9 +20,9 @@ Bruno Henrique Rasteiro, 9292910
 #define DEL_REG '#'
 
 // delimitador do campo arquivo de saída
-#define DEL_FIELD ';' // TODO: mudar delimitador de campo
+#define DEL_FIELD ';'
 
-// caracter para marcar exclusão lógica de registro no arquivo de dados 
+// caracter para marcar exclusão lógica de registro no arquivo de dados
 #define EXC_LOG '@'
 
 // caminho do arquivo de entrada

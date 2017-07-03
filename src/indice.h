@@ -64,11 +64,11 @@ int _remover_indice(INDICE* indice, char* chave);
 //**************************//
 //* FUNÇÕES PARA INSERÇÃO  *//
 //**************************//
-int inserirFF(FILE* file, INDICE* indice, Registro* reg);
-long int _inserirFF_dado(FILE* file, Registro* reg);
+int inserirFirstFit(FILE* file, INDICE* indice, Registro* reg);
+long int _inserirFirstFit_dado(FILE* file, Registro* reg);
 int _getFragAndPosFF(FILE* file, int sizeReg, long int* antP, long int* atualP, long int *proxP);
 void _tratarFragIntFF(FILE* file, int fragInt, int sizeReg, long int* atual, long int* prox);
-void _inserirFF_indice(INDICE* indice, char* chave, long int referencia);
+void _inserirFirstFit_indice(INDICE* indice, char* chave, long int referencia);
 
 //************************//
 //* FUNÇÕES UTILITÁRIAS  *//

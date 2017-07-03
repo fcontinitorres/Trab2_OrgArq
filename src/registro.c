@@ -81,7 +81,7 @@ void csv2Bin(FILE *entrada, FILE *saida1, FILE *saida2, FILE *saida3) {
         }
 
         // chegou em um novo campo
-        if (c == ';') {
+        if (c == DEL_FIELD) {
             // incrementa qual campo o arquivo está lendo
             field++;
             // zera o indice do campo que será lido
@@ -173,22 +173,18 @@ void salvarCampo(Registro *reg, FILE *file) {
 	// CNPJ
 	sizeField = strlen(reg->cnpj); // calcula tamanho da string
 	fwrite(reg->cnpj, sizeof(char), sizeField, file); // frwite string
-	//if(org != 'I') fwrite(&delField, sizeof(char), 1, file);
 
 	// Data do Registro
 	sizeField = strlen(reg->dtReg);
 	fwrite(reg->dtReg, sizeof(char), sizeField, file);
-	//if(org != 'I') fwrite(&delField, sizeof(char), 1, file);
 
 	// Data do Cancelamento
 	sizeField = strlen(reg->dtCanc);
 	fwrite(reg->dtCanc, sizeof(char), sizeField, file);
-	//if(org != 'I') fwrite(&delField, sizeof(char), 1, file);
 
 	// CNPJ da Empresa de Auditoria
 	sizeField = strlen(reg->cnpjAud);
 	fwrite(reg->cnpjAud, sizeof(char), sizeField, file);
-	//if(org != 'I') fwrite(&delField, sizeof(char), 1, file);
 
 	/********************************************//**
      *  Campos variáveis
@@ -248,8 +244,8 @@ void listarBinario(FILE *file) {
 
 		// verifica se o campo esta logicamente removido
 		fread(&c, sizeof(char), 1, file);
-		if (c == EXC_LOG){
-			//le o tamanho do registro deletado e pula ele
+		if (c == EXC_LOG) {
+			// le o tamanho do registro deletado e pula ele
 			fread(&sizeField, sizeof(int), 1, file);
 			fseek(file, sizeField - sizeof(int), SEEK_CUR);
 		}
@@ -398,11 +394,22 @@ Registro* buscaCampoCNPJ(FILE *file, char *strBusca) {
 	Parâmetros:
 		reg = Registro que irá receber null em seus campos variáveis
 */
-void anularCampos(Registro *reg) {
+Registro* anularCampos(Registro *reg) {
+    int i;
+    for (i = 0; i < SIZE_CNPJ; i++) {
+        reg->cnpj[i] = '0';
+        reg->cnpjAud[i] = '0';
+    }
+    for (i = 0; i < 9; i++) {
+        reg->dtReg[i] = '0';
+        reg->dtCanc[i] = '0';
+    }
     reg->razSoc  = NULL;
     reg->nomeFant = NULL;
     reg->motCanc  = NULL;
     reg->nomeEmp  = NULL;
+
+    return reg;
 }
 
 /*	Descrição:

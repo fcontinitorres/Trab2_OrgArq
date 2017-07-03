@@ -15,6 +15,7 @@ debug:
 
 clean:
 	rm -f vgcore*
+	rm -r *.o
 
 zip:
 	zip -r parte2.zip ./

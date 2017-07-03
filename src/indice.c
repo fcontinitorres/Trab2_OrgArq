@@ -67,7 +67,7 @@ INDICE* ler_indice(FILE* arquivo, INDICE* indice) {
         // ler referencia
         fread(&referencia, sizeof(long int), 1, arquivo);
 
-        //indice = inserir_indice(indice, CNPJ, referencia);
+        // inserir novo nó de índice em RAM
         _inserir_indice(indice, CNPJ, referencia);
 
     } while(!feof(arquivo));
@@ -107,10 +107,10 @@ INDICE* criar_indices(FILE *saida) {
     // inicializar registro
     Registro* reg; // registro a ser lido
     reg = (Registro *)malloc(sizeof(Registro));
-    int byte_offset = 0; // byte offset atual
+    long int byte_offset = 0; // byte offset atual
     char c = 'c'; // caracter para percorrer arquivo
 
-    //reseta arquivo de saida para o inicio dos dados
+    // reseta arquivo de saida para o inicio dos dados
     fseek(saida, 8, SEEK_SET);
 
     // inicializar índice
@@ -156,6 +156,10 @@ INDICE* criar_indices(FILE *saida) {
         } while (c != DEL_REG);
 
     } while (!feof(saida));
+
+    // ignorar último nó
+    // nó nulo é criado no final da lista
+    indice->tamanho -= 1;
 
     // ordenar índices
     indice = atualizar_indice(indice);
@@ -249,22 +253,22 @@ void imprimir_indice(INDICE* indice) {
 
 /*
     Descrição:
-        Pesquisa por um CNPJ no indice em RAM 
+        Pesquisa por um CNPJ no indice em RAM
     Parâmetros:
         indice = indice em RAM
         chave = chave de busca (CNPJ)
     Retorno:
         Retorna a referencia (byte offset) do registro
 */
-long int _pesquisa_indice(INDICE* indice, char* chave){
+long int _pesquisa_indice(INDICE* indice, char* chave) {
     int i;
     int cmp;
     long int referencia = -1;
 
-    for (i=0; i < indice->tamanho; i++){
+    for (i=0; i < indice->tamanho; i++) {
         cmp = strcmp(chave, indice->lista[i]->chave);
 
-        if (cmp == 0){
+        if (cmp == 0) {
             // salvando referencia para retornar
             referencia = indice->lista[i]->referencia;
             break;
@@ -298,16 +302,16 @@ void destruir_indice(INDICE** indice) {
 
 /*  Descrição:
         Remoção de um registro, a remoção ocorre tanto no arquivo de dados
-        quanto no indice em memória.        
+        quanto no indice em memória.
     Parâmetros:
         file = arquivo de dados
         indice = ponteiro para o indice em memória ram
-        chave = string de busca         
+        chave = string de busca
     Retorno:
         Retorna o resultado da remoção, 1 para removido, 0 para não removido
-        
+
 */
-int remover(FILE* file, INDICE* indice, char* chave){
+int remover(FILE* file, INDICE* indice, char* chave) {
     long int referencia;
 
     // pesquisa referência do registro no arquivo de índice
@@ -330,13 +334,13 @@ int remover(FILE* file, INDICE* indice, char* chave){
 
 /*
     Descrição:
-        Remove um registro do arquivo de dados 
+        Remove um registro do arquivo de dados
     Parâmetros:
         file = arquivo de dados
         referencia = byte offset do registro a ser removido
 */
-void _remover_dado(FILE* file, long int referencia){
-    char exc_log = EXC_LOG; 
+void _remover_dado(FILE* file, long int referencia) {
+    char exc_log = EXC_LOG;
     long int head;
     int sizeReg;
     char c;
@@ -365,7 +369,7 @@ void _remover_dado(FILE* file, long int referencia){
         if (c != DEL_REG)
             sizeReg++;
     } while (c != DEL_REG);
-    
+
     // fseek até o inicio do registro a ser deletado
     fseek (file, referencia, SEEK_SET);
 
@@ -387,7 +391,7 @@ void _remover_dado(FILE* file, long int referencia){
         indice = ponteiro para o índice em RAM
         chave = string (CNPJ) de busca para a remoção
     Retorno:
-        Retorna 1 caso a remoção seja bem sucedida, 
+        Retorna 1 caso a remoção seja bem sucedida,
         0 caso a chave não seja localizada
 */
 int _remover_indice(INDICE* indice, char* chave) {
@@ -396,25 +400,25 @@ int _remover_indice(INDICE* indice, char* chave) {
     int cmp;
     int removeu = 0;
 
-    for (i=0; i < indice->tamanho; i++){
+    for (i=0; i < indice->tamanho; i++) {
         cmp = strcmp(chave, indice->lista[i]->chave);
 
-        if (cmp == 0){
-            
+        if (cmp == 0) {
+
             // atualizando vetor de indices
             for (k=i+1; k < indice->tamanho; k++)
                 //indice->lista[k-1] = indice->lista[k];
                 copiar_no(indice->lista[k-1], indice->lista[k]);
-            
+
             // removendo ultimo indice
             free(indice->lista[k-1]);
-            
+
             // atualizando tamanho do indice
             indice->tamanho--;
 
             // atualizando o vetor de indices
             indice->lista = (NO**)realloc(indice->lista, sizeof(NO*) * indice->tamanho);
-        
+
             removeu = 1;
             break;
         }
@@ -435,14 +439,14 @@ int _remover_indice(INDICE* indice, char* chave) {
         indice = ponteiro para o índice em RAM
         reg = registro a ser inserido
     Retorno:
-        Retorna 1 caso a inserção seja bem sucedida, 
+        Retorna 1 caso a inserção seja bem sucedida,
         0 caso contrario
 */
-int inserirFF(FILE* file, INDICE* indice, Registro* reg) {
+int inserirFirstFit(FILE* file, INDICE* indice, Registro* reg) {
     long int referencia;
 
     // inserindo registro no arquivo de dados
-    referencia = _inserirFF_dado(file, reg);
+    referencia = _inserirFirstFit_dado(file, reg);
 
     // inserindo referencia no arquivo de indice
     _inserir_indice(indice, reg->cnpj, referencia);
@@ -459,7 +463,7 @@ int inserirFF(FILE* file, INDICE* indice, Registro* reg) {
     Retorno:
         Retorna o byte offset do registro no arquivo de dados
 */
-long int _inserirFF_dado(FILE* file, Registro* reg){
+long int _inserirFirstFit_dado(FILE* file, Registro* reg) {
     int sizeReg;
     int fragInt;
     long int atual;
@@ -474,7 +478,7 @@ long int _inserirFF_dado(FILE* file, Registro* reg){
     sizeReg += strlen(reg->motCanc);
     sizeReg += strlen(reg->nomeEmp);
     sizeReg += sizeof(char) * 4; // delimitadores de campo
-    
+
     // Captura a posição (através de ant, atual e prox) na inserção interna no arquivo de dados
     // e retorna a fragmentação interna
     fragInt = _getFragAndPosFF(file, sizeReg, &ant, &atual, &prox);
@@ -494,14 +498,14 @@ long int _inserirFF_dado(FILE* file, Registro* reg){
         // trata a fragmentação interna
         _tratarFragIntFF(file, fragInt, sizeReg, &atual, &prox);
 
-        // encontra o Byte Ofsset para atualização do anterior 
+        // encontra o Byte Ofsset para atualização do anterior
         if (ant == -1)
             // fseek para cabeça da lista
-            fseek(file, 0, SEEK_SET);                
-        else 
+            fseek(file, 0, SEEK_SET);
+        else
             // fseek para o item anterior da lista
             fseek(file, ant + sizeof(char) + sizeof(int), SEEK_SET);
-        
+
         // grava o próximo no anterior
         fwrite(&prox, sizeof(long int), 1, file);
     }
@@ -526,17 +530,17 @@ long int _inserirFF_dado(FILE* file, Registro* reg){
         Verifica se o espaço que sobrou na inserção de um arquivo (a fragmentação interna),
         pode ser adicionada a lista de excluidos.
         Obs: Ela não poderá ser adiciona caso não seja grande o suficiente para caber,
-        os campos 
+        os campos
     Parâmetros:
         file = arquivo de dados
         sizeReg = tamanho do registro (não inclui o delimitador de registros)
         antP = byte offset anterir na lista de removidos
         atualP = byte offset atual na lista de removidos
-        proxP = próximo byte offset na lista de removidos 
+        proxP = próximo byte offset na lista de removidos
     Retorno:
         Retorna a fragmentação interna ocasionada pela inserção
 */
-int _getFragAndPosFF(FILE* file, int sizeReg, long int* antP, long int* atualP, long int *proxP){
+int _getFragAndPosFF(FILE* file, int sizeReg, long int* antP, long int* atualP, long int *proxP) {
     long int ant, atual, prox;
     int encontrou = 0;
     int sizeRegDisp;
@@ -550,19 +554,19 @@ int _getFragAndPosFF(FILE* file, int sizeReg, long int* antP, long int* atualP, 
     // le a cabeça da lista de remoção (byte offset do registro topo da lista)
     fread(&atual, sizeof(long int), 1, file);
 
-    while (atual != -1){
+    while (atual != -1) {
 
         // fseek para a area de inserção
         fseek(file, atual + sizeof(char), SEEK_SET);
 
         // le o espaço disponível para um novo registro
         fread(&sizeRegDisp, sizeof(int), 1, file);
-        
+
         // le qual é o próximo registro da lista
         fread(&prox, sizeof(long int), 1, file);
 
         // se tem espaço suficiente para o registro
-        if (sizeReg <= sizeRegDisp){
+        if (sizeReg <= sizeRegDisp) {
             encontrou = 1;
             break;
         }
@@ -599,7 +603,7 @@ int _getFragAndPosFF(FILE* file, int sizeReg, long int* antP, long int* atualP, 
         atual = byte offset atual na lista de removidos
         prox = próximo byte offset na lista de removidos
 */
-void _tratarFragIntFF(FILE* file, int fragInt, int sizeReg, long int* atual, long int* prox){
+void _tratarFragIntFF(FILE* file, int fragInt, int sizeReg, long int* atual, long int* prox) {
     char exc_log = EXC_LOG;
     char del_reg = DEL_REG;
 
@@ -655,4 +659,3 @@ long int converter_CNPJ(char* CNPJ) {
     }
     return convertido;
 }
-

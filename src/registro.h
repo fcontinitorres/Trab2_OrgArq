@@ -45,7 +45,7 @@ void salvarCampo(Registro *reg, FILE *file);
 
 void salvarRegistro(Registro *reg, FILE *file);
 
-void anularCampos(Registro *reg);
+Registro* anularCampos(Registro *reg);
 
 void addCharFieldTxt(Registro *reg, char c, int field, int iField);
 

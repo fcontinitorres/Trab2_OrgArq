@@ -11,8 +11,12 @@ Bruno Henrique Rasteiro, 9292910
 #include "menu.h"
 #include "indice.h"
 
-
-char* readStr(int len){
+/*	Descrição:
+		Lê e retorna string de tamanho 'len'
+	Parâmetros:
+		int len = tamanho da string a ser lida
+*/
+char* readStr(int len) {
 	char* str;
 	int i, count;
 
@@ -25,7 +29,7 @@ char* readStr(int len){
 			break;
 
 	str[i] = '\0';
-	
+
 	str = (char *) realloc(str, (i) * sizeof(char));
 
 	return(str);
@@ -84,32 +88,6 @@ void opcao1(FILE *file) {
 	listarBinario(file);
 	// reseta ponteiro do arquivo
 	fseek(file, 0, SEEK_SET);
-
-
-/* Eu (bruno) estava usando esse print do arquivo todo para testar a inserção(FF) e remoção
-
-	char c;
-	int size;
-	long int ref;
-
-	fseek(file, 0, SEEK_SET);
-
-	fread(&ref,  sizeof(long int), 1, file);
-	printf("HEAD = %ld\n", ref);
-
-	do {
-		c = fgetc(file);
-		if (c != EOF)
-			printf("%c", c);
-
-		if (c == '@'){
-			fread(&size, sizeof(int), 1, file);
-			fread(&ref,  sizeof(long int), 1, file);
-			printf("'%d'%ld'", size, ref);	
-		}
-
-	} while (c != EOF);
-*/
 }
 
 /*	Descrição:
@@ -128,29 +106,14 @@ void opcao2(INDICE* indice1, INDICE* indice2, INDICE* indice3, FILE* saida1, FIL
 		printf("Registro removido com sucesso.\n");
 	else
 		printf("Erro ao remover registro, CNPJ não encontrado.\n");
-
-/*
-	// busca
-	reg = buscaCampoCNPJ(file, strBusca);
-
-	if (reg != NULL) {
-		printf("Registro Localizado\n");
-		printRegistro(reg);
-		free(reg->razSoc);
-		free(reg->nomeFant);
-		free(reg->motCanc);
-		free(reg->nomeEmp);
-	}
-	else
-		printf("Não foi possível localizar o registro.\n");
-
-	// reseta ponteiro do arquivo
-	fseek(file, 0, SEEK_SET);
-	free(reg);
-	free(strBusca);
-*/
 }
 
+/*	Descrição:
+		Realiza as tarefas para executar a terceira opção do menu
+	Parâmetros:
+		FILE* = arquivos de saída
+        INDICE* = índices em memória primária
+*/
 void opcao3(INDICE* indice1, INDICE* indice2, INDICE* indice3, FILE* saida1, FILE* saida2, FILE* saida3) {
 	Registro* reg;
 	char* str;
@@ -163,7 +126,7 @@ void opcao3(INDICE* indice1, INDICE* indice2, INDICE* indice3, FILE* saida1, FIL
 	strcpy(reg->cnpj, str);
 	getchar();
 	free(str);
-	
+
 	printf("Informe a Data de Registro: ");
 	str = readStr(SIZE_DATA + 1);
 	strcpy(reg->dtReg, str);
@@ -195,18 +158,23 @@ void opcao3(INDICE* indice1, INDICE* indice2, INDICE* indice3, FILE* saida1, FIL
 	reg->nomeEmp = readStr(1000);
 
 	// inserindo
-	if (inserirFF(saida1, indice1, reg))
+	if (inserirFirstFit(saida1, indice1, reg))
 		printf("Rgistro inserido com sucesso\n");
 	else
 		printf("Erro ao inserir registro. Tente novamente.\n");
 }
 
-void opcao4() {
+void opcao4(INDICE* r1, INDICE* r2, INDICE* r3) {
+
+	printf("\nÍNDICE 1\n");
+	imprimir_indice(r1);
+	printf("\nÍNDICE 2\n");
+	imprimir_indice(r2);
+	printf("\nÍNDICE 3\n");
+	imprimir_indice(r3);
 
 }
 
 void opcao5() {
 
 }
-
-

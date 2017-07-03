@@ -52,8 +52,7 @@ int main() {
 	// interface
 	flag = 1;
 	while(flag) {
-		printf("\n");
-		imprimir_indice(indiceR1);
+
 		printf("\n++++++++++++++++++++++++++++++++++++++++\n");
 		printf("+                 MENU                 +\n");
 		printf("++++++++++++++++++++++++++++++++++++++++\n");
@@ -83,7 +82,7 @@ int main() {
 
 			case 4:
 				// TODO - estatísticas índices
-				opcao4();
+				opcao4(indiceR1, indiceR2, indiceR3);
 				break;
 
 			case 5:
