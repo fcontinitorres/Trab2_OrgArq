@@ -79,9 +79,12 @@ void listarRemovidos(FILE *file) {
 	// Retorna o indice do arquivo para onde o usuario estava originalmente
 	fseek(file, filePos, SEEK_SET);
 }
-/* 	Descricao:
+/* 	Descricao: Funcao que lista os registros de cada arquivo de indice
 
 	Parametros:
+		indiceR1 = Ponteiro para o indice do arquivo 1 em RAM
+		indiceR2 = Ponteiro para o indice do arquivo 2 em RAM
+		indiceR3 = Ponteiro para o indice do arquivo 3 em RAM
 
 */
 void indices_estat(INDICE* indiceR1, INDICE* indiceR2, INDICE* indiceR3){
