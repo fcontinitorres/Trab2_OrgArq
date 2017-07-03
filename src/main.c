@@ -76,12 +76,10 @@ int main() {
 				break;
 
 			case 3:
-				// TODO - inserção de registro
 				opcao3(indiceR1, indiceR2, indiceR3, saida1, saida2, saida3);
 				break;
 
 			case 4:
-				// TODO - estatísticas índices
 				opcao4(indiceR1, indiceR2, indiceR3);
 				break;
 
@@ -110,7 +108,11 @@ int main() {
 	fclose(indiceF2);
 	fclose(indiceF3);
 
-	// TODO - Destruir índices
-	// TODO - Destruir qualquer coisa alocada em heap
+	// desalocar índices da RAM
+	destruir_indice(&indiceR1);
+	destruir_indice(&indiceR2);
+	destruir_indice(&indiceR3);
+
+	return 0;
 
 }
