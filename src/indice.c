@@ -645,7 +645,6 @@ int insereReg(FILE* file, INDICE* indice, Registro* reg, int op){
 
 	if(flag == 1){ //escreve o registro na melhor posicao encontrada
 		fseek(file, pos, SEEK_SET);
-		salvarRegistro(reg, file);
 		flag = 2;		
 		_inserir_indice(indice, reg->cnpj, pos);
 	}
@@ -658,6 +657,7 @@ int insereReg(FILE* file, INDICE* indice, Registro* reg, int op){
 		_inserir_indice(indice, reg->cnpj, pos);
 	}
 
+	salvarRegistro(reg, file);
 
 	if(flag == 2) return 1;
 	return 0;
