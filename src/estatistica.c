@@ -10,8 +10,6 @@ Bruno Henrique Rasteiro, 9292910
 
 void listarRemovidos(FILE *file) {
 	
-	fprintf(stderr, "LISTAR REMOVIDOS\n");
-
 	long int head;
 	long int next;
 	int regCounter = 0;
@@ -35,10 +33,9 @@ void listarRemovidos(FILE *file) {
 	// le a cabeça da lista de removidos (byte offset do primeiro registro removido)
 	// se for -1 está vazio
 	fread(&head, sizeof(long int), 1, file);
-	fprintf(stderr, "HEAD: %ld\n", head);
 	if(head == -1){
 
-		fprintf(stderr, "Lista de registros removidos está vazia.\n");
+		printf("Lista de registros removidos está vazia.\n");
 		
 		// Retorna o indice do arquivo para onde o usuario estava originalmente
 		fseek(file, filePos, SEEK_SET);
@@ -47,11 +44,10 @@ void listarRemovidos(FILE *file) {
 
 	// Move para o primeiro registro removido + sizeof(char) do char de exclusao
 	fseek(file, head + sizeof(char), SEEK_SET);
-	fprintf(stderr, "ftell %ld\n", ftell(file));
 
     // Lê do arquivo até acabar a lista de registros removidos
 	do {
-		getchar();
+
 		// Incrementa o contador de registros
 		regCounter++;
 		
@@ -59,19 +55,17 @@ void listarRemovidos(FILE *file) {
 		fread(&size, sizeof(int), 1, file);
 
 		// Imprime o byte offset do registro e seu tamanho
-		fprintf(stderr, "Offset: %ld\t Tamanho: %d\n", ftell(file)-5, size);
+		printf("Offset: %ld\t Tamanho: %d\n", ftell(file)-5, size);
 
 		// Le o byte offset do próximo registro
 		fread(&next, sizeof(long int), 1, file);
 
-		fprintf(stderr, "NEXT: %ld\n", next);
-
 		// vai pro próximo da lista
-		fseek(file, next, SEEK_SET);
+		fseek(file, next+1, SEEK_SET);
 
 	} while(next != -1);
 
-	fprintf(stderr, "Numero de registros removidos: %d\n", regCounter);
+	printf("Numero de registros removidos: %d\n", regCounter);
 
 	// Retorna o indice do arquivo para onde o usuario estava originalmente
 	fseek(file, filePos, SEEK_SET);

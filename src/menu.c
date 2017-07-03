@@ -17,7 +17,7 @@ char* readStr(int len){
 	char* str;
 	int i;
 
-	str = (char *) malloc(len * sizeof(char));
+	str = (char *) malloc((len+1) * sizeof(char));
 
 	fgets(str, len, stdin);
 
@@ -125,23 +125,25 @@ void opcao2(INDICE* indice1, INDICE* indice2, INDICE* indice3, FILE* saida1, FIL
 	printf("Informe o CNPJ a ser buscado: ");
 	strBusca = readStr(SIZE_CNPJ + 1);
 
-	fprintf(stderr, "Removendo do arquivo 1\n");
+	printf("Removendo do arquivo 1\n");
 	if (remover(saida1, indice1, strBusca))
 		printf("Registro removido com sucesso.\n");
 	else
 		printf("Erro ao remover registro, CNPJ não encontrado.\n");
 
-	fprintf(stderr, "Removendo do arquivo 2\n");
+	printf("Removendo do arquivo 2\n");
 	if (remover(saida2, indice2, strBusca))
 		printf("Registro removido com sucesso.\n");
 	else
 		printf("Erro ao remover registro, CNPJ não encontrado.\n");
 
-	fprintf(stderr, "Removendo do arquivo 3\n");
+	printf("Removendo do arquivo 3\n");
 	if (remover(saida3, indice3, strBusca))
 		printf("Registro removido com sucesso.\n");
 	else
 		printf("Erro ao remover registro, CNPJ não encontrado.\n");
+
+	free(strBusca);
 
 /*
 	// busca
@@ -209,19 +211,19 @@ void opcao3(INDICE* indice1, INDICE* indice2, INDICE* indice3, FILE* saida1, FIL
 	reg->nomeEmp = readStr(1000);
 
 	// inserindo
-	fprintf(stderr, "Inserindo no arquivo 1\n");
+	printf("Inserindo no arquivo 1\n");
 	if (inserirFF(saida1, indice1, reg))
 		printf("Rgistro inserido com sucesso\n");
 	else
 		printf("Erro ao inserir registro. Tente novamente.\n");
 
-	fprintf(stderr, "Inserindo no arquivo 2\n");
+	printf("Inserindo no arquivo 2\n");
 	if (inserirFF(saida2, indice2, reg))
 		printf("Rgistro inserido com sucesso\n");
 	else
 		printf("Erro ao inserir registro. Tente novamente.\n");
 
-	fprintf(stderr, "Inserindo no arquivo 3\n");
+	printf("Inserindo no arquivo 3\n");
 	if (inserirFF(saida3, indice3, reg))
 		printf("Rgistro inserido com sucesso\n");
 	else

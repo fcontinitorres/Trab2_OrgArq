@@ -110,7 +110,10 @@ int main() {
 	fclose(indiceF2);
 	fclose(indiceF3);
 
-	// TODO - Destruir índices
+	deletar_indice(&indiceR1);
+	deletar_indice(&indiceR2);
+	deletar_indice(&indiceR3);
+
 	// TODO - Destruir qualquer coisa alocada em heap
 
 }
