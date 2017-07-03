@@ -8,6 +8,15 @@ Bruno Henrique Rasteiro, 9292910
 
 #include "estatistica.h"
 
+
+/* 	Descricao: Funcao utilizada para listar quais registros foram removidos
+		de cada arquivo.
+
+	Parametros:
+		file = Ponteiro do arquivo que de saida que sera checado se possui registro removido
+
+*/
+
 void listarRemovidos(FILE *file) {
 	
 	long int head;
@@ -70,21 +79,11 @@ void listarRemovidos(FILE *file) {
 	// Retorna o indice do arquivo para onde o usuario estava originalmente
 	fseek(file, filePos, SEEK_SET);
 }
-int quant_entradas(Registro *reg){
+/* 	Descricao:
 
-	int count = 0;
-	if(reg->cnpj[0] == 'n') count++;
-	if(reg->dtReg[0] == 'n') count++;
-	if(reg->dtCanc[0] == 'n') count++;
-	if(reg->cnpjAud[0] == 'n') count++;
-	if(reg->razSoc == NULL) count++;
-	if(reg->nomeFant == NULL) count++;
-	if(reg->motCanc == NULL) count++;
-	if(reg->nomeEmp == NULL) count++;
+	Parametros:
 
-	return count;
-}
-
+*/
 void indices_estat(INDICE* indiceR1, INDICE* indiceR2, INDICE* indiceR3){
 
 	//int quantI1 = indiceR1->tamanho, quantI2 = indiceR1->tamanho, quantI3 = indiceR1->tamanho;
