@@ -131,18 +131,6 @@ void opcao2(INDICE* indice1, INDICE* indice2, INDICE* indice3, FILE* saida1, FIL
 	else
 		printf("Erro ao remover registro, CNPJ não encontrado.\n");
 
-	printf("Removendo do arquivo 2\n");
-	if (remover(saida2, indice2, strBusca))
-		printf("Registro removido com sucesso.\n");
-	else
-		printf("Erro ao remover registro, CNPJ não encontrado.\n");
-
-	printf("Removendo do arquivo 3\n");
-	if (remover(saida3, indice3, strBusca))
-		printf("Registro removido com sucesso.\n");
-	else
-		printf("Erro ao remover registro, CNPJ não encontrado.\n");
-
 	free(strBusca);
 
 /*
@@ -217,17 +205,6 @@ void opcao3(INDICE* indice1, INDICE* indice2, INDICE* indice3, FILE* saida1, FIL
 	else
 		printf("Erro ao inserir registro. Tente novamente.\n");
 
-	printf("Inserindo no arquivo 2\n");
-	if (inserirFF(saida2, indice2, reg))
-		printf("Rgistro inserido com sucesso\n");
-	else
-		printf("Erro ao inserir registro. Tente novamente.\n");
-
-	printf("Inserindo no arquivo 3\n");
-	if (inserirFF(saida3, indice3, reg))
-		printf("Rgistro inserido com sucesso\n");
-	else
-		printf("Erro ao inserir registro. Tente novamente.\n");
 }
 
 void opcao4(INDICE* indice1, INDICE* indice2, INDICE* indice3) {
