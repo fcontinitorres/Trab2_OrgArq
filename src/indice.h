@@ -76,4 +76,7 @@ void _inserirFirstFit_indice(INDICE* indice, char* chave, long int referencia);
 NO* copiar_no(NO* a, NO* b); // auxiliar para ordenação
 long int converter_CNPJ(char* CNPJ);
 
+int insereReg(FILE* file, INDICE* indice, Registro* reg, int op);
+int tamanhoRegistro(Registro* reg);
+
 #endif

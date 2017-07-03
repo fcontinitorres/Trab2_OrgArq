@@ -102,10 +102,23 @@ void opcao2(INDICE* indice1, INDICE* indice2, INDICE* indice3, FILE* saida1, FIL
 	printf("Informe o CNPJ a ser buscado: ");
 	strBusca = readStr(SIZE_CNPJ + 1);
 
-	if (remover(saida1, indice1, strBusca))
-		printf("Registro removido com sucesso.\n");
-	else
-		printf("Erro ao remover registro, CNPJ não encontrado.\n");
+	if (remover(saida1, indice1, strBusca)){
+		imprimir_indice(indice1);
+		printf("Registro(arquivo1) removido com sucesso.\n");
+	}else
+		printf("Erro ao remover registro(arquivo1), CNPJ não encontrado.\n");
+	
+	if (remover(saida2, indice2, strBusca)){
+		imprimir_indice(indice2);
+		printf("Registro(arquivo2) removido com sucesso.\n");
+	}else
+		printf("Erro ao remover registro(arquivo2), CNPJ não encontrado.\n");
+	
+	if (remover(saida3, indice3, strBusca)){
+		imprimir_indice(indice3);
+		printf("Registro(arquivo3) removido com sucesso.\n");
+	}else
+		printf("Erro ao remover registro(arquivo3), CNPJ não encontrado.\n");
 }
 
 /*	Descrição:
@@ -117,6 +130,7 @@ void opcao2(INDICE* indice1, INDICE* indice2, INDICE* indice3, FILE* saida1, FIL
 void opcao3(INDICE* indice1, INDICE* indice2, INDICE* indice3, FILE* saida1, FILE* saida2, FILE* saida3) {
 	Registro* reg;
 	char* str;
+	int op;
 
 	reg = (Registro *) malloc(sizeof(Registro));
 
@@ -157,11 +171,33 @@ void opcao3(INDICE* indice1, INDICE* indice2, INDICE* indice3, FILE* saida1, FIL
 	printf("Informe o nome da empresa auditora: ");
 	reg->nomeEmp = readStr(1000);
 
+	printf("\n\nModo de Insercao: \n1 - First Fit\n2 - Best Fit\n3 - Worst Fit\n");
+	scanf("%d", &op);
+
+
 	// inserindo
-	if (inserirFirstFit(saida1, indice1, reg))
-		printf("Rgistro inserido com sucesso\n");
-	else
-		printf("Erro ao inserir registro. Tente novamente.\n");
+	switch(op){
+		case 1:	if (inserirFirstFit(saida1, indice1, reg)){
+				imprimir_indice(indice1);
+				printf("Registro inserido(First Fit) com sucesso.\n");
+			}else
+				printf("Erro ao inserir o registro. Tente novamente.\n");
+			break;
+		
+		case 2: if (insereReg(saida2, indice2, reg, op)){
+				imprimir_indice(indice2); 
+				printf("Registro inserido(Best Fit) com sucesso.\n");
+			}else
+				printf("Erro ao inserir o registro. Tente novamento.\n");
+			break;
+
+		case 3: if (insereReg(saida3, indice3, reg, op)){
+				imprimir_indice(indice3);
+				printf("Registro inserido(Worst Fit) com sucesso.\n");
+			}else
+				printf("Erro ao inserir o registro. Tente novamente.\n");
+			break;
+	}
 }
 
 void opcao4(INDICE* r1, INDICE* r2, INDICE* r3) {

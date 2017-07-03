@@ -4,6 +4,7 @@ Felipe Scrochio Custodio, 9442688
 Felipe Contini Torres, 9253670
 Júlia Diniz Ferreira, 9364865
 Bruno Henrique Rasteiro, 9292910
+Renan Rodrigues, 9278132
 */
 
 #include "indice.h"
@@ -454,12 +455,17 @@ int inserirFirstFit(FILE* file, INDICE* indice, Registro* reg) {
     return(1);
 }
 
+
+int tamanhoRegistro(Registro* reg){
+	return ( (SIZE_CNPJ*2)+(SIZE_DATA*2)+strlen(reg->razSoc)+strlen(reg->nomeFant)+strlen(reg->motCanc)+strlen(reg->nomeEmp)+sizeof(char)*4 );
+}
+
 /*
     Descrição:
         Insere um registro no arquivo de dados seguindo a técnica First Fit
     Parâmetros:
         file = arquivo de dados
-        reg = registro a ser inserido
+        reg = registro a	 ser inserido
     Retorno:
         Retorna o byte offset do registro no arquivo de dados
 */
@@ -472,12 +478,7 @@ long int _inserirFirstFit_dado(FILE* file, Registro* reg) {
     long int posInsert = -1;
 
     // calcula tamanho do registro
-    sizeReg  = SIZE_CNPJ*2 + SIZE_DATA*2;
-    sizeReg += strlen(reg->razSoc);
-    sizeReg += strlen(reg->nomeFant);
-    sizeReg += strlen(reg->motCanc);
-    sizeReg += strlen(reg->nomeEmp);
-    sizeReg += sizeof(char) * 4; // delimitadores de campo
+    sizeReg = tamanhoRegistro(reg);
 
     // Captura a posição (através de ant, atual e prox) na inserção interna no arquivo de dados
     // e retorna a fragmentação interna
@@ -585,6 +586,81 @@ int _getFragAndPosFF(FILE* file, int sizeReg, long int* antP, long int* atualP, 
         return(sizeRegDisp - (sizeReg + sizeof(char)));
     else
         return(-1);
+}
+
+
+int insereReg(FILE* file, INDICE* indice, Registro* reg, int op){
+	int flag = 0; //verificar para caso nao tenha nenhum registro removido no arquivo
+	int size = 0;
+	long int pos = -1; //guarda a posicao inicial de um registro removido
+	int sizeReg = 0; //guarda o espaco de um registro removido para comparacao
+	long int count = 0; //contador
+	long int auxPos = 0;
+	int auxSize = 0;
+	char c = 'c'; //caracter que percorre o arquivo	
+	char exc_log = EXC_LOG; //caracter de exclusao
+
+	size = tamanhoRegistro(reg);	
+
+	rewind(file);
+	while(c != EOF){
+		c = fgetc(file);
+		count++;
+		if(c == exc_log){ //achou o caracter de exclusao logica
+			if(pos == -1){ //achou o primeiro registro removido
+				pos = count; //pos recebe a posicao do caracter no arquivo		
+			
+				c = fgetc(file);
+				sizeReg = (int)c; //sizeReg recebe o tamanho do registro excluido
+
+				if(sizeReg >= size) flag = 1;
+				else{ //o registro eh menor que o necessario
+					pos = -1;
+					sizeReg = 0;
+				}
+			}
+
+			else{
+				auxPos = count;
+				
+				c = fgetc(file);
+				auxSize = (int)c;
+					
+					if(op == 2){
+						 if(auxSize >= size && auxSize < sizeReg){ //se o novo registro removido encontrado servir e for menor (mais justo) que o primeiro encontrado, troca
+							pos = auxPos;
+							sizeReg = auxSize;
+						}
+					}
+					else{ //op == 3
+						if(auxSize >= size && auxSize > sizeReg){ //se o novo registro removido encontrado servir e for maior que o primeiro encontrado, troca
+							pos = auxPos;
+							sizeReg = auxSize;
+						}
+					}
+			}
+			fseek(file, sizeReg, SEEK_CUR); //pula para o proximo registro valido		
+		}
+	}
+
+	if(flag == 1){ //escreve o registro na melhor posicao encontrada
+		fseek(file, pos, SEEK_SET);
+		salvarRegistro(reg, file);
+		flag = 2;		
+		_inserir_indice(indice, reg->cnpj, pos);
+	}
+
+	if(flag == 0){ //adicionar registro no final
+		salvarRegistro(reg, file);
+		flag = 2;
+		fseek(file, 0, SEEK_END);
+		pos = ftell(file);
+		_inserir_indice(indice, reg->cnpj, pos);
+	}
+
+
+	if(flag == 2) return 1;
+	return 0;
 }
 
 /*
