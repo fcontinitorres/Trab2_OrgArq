@@ -15,7 +15,7 @@ Bruno Henrique Rasteiro, 9292910
 
 char* readStr(int len){
 	char* str;
-	int i, count;
+	int i;
 
 	str = (char *) malloc(len * sizeof(char));
 
@@ -125,7 +125,20 @@ void opcao2(INDICE* indice1, INDICE* indice2, INDICE* indice3, FILE* saida1, FIL
 	printf("Informe o CNPJ a ser buscado: ");
 	strBusca = readStr(SIZE_CNPJ + 1);
 
+	fprintf(stderr, "Removendo do arquivo 1\n");
 	if (remover(saida1, indice1, strBusca))
+		printf("Registro removido com sucesso.\n");
+	else
+		printf("Erro ao remover registro, CNPJ não encontrado.\n");
+
+	fprintf(stderr, "Removendo do arquivo 2\n");
+	if (remover(saida2, indice2, strBusca))
+		printf("Registro removido com sucesso.\n");
+	else
+		printf("Erro ao remover registro, CNPJ não encontrado.\n");
+
+	fprintf(stderr, "Removendo do arquivo 3\n");
+	if (remover(saida3, indice3, strBusca))
 		printf("Registro removido com sucesso.\n");
 	else
 		printf("Erro ao remover registro, CNPJ não encontrado.\n");
@@ -196,7 +209,20 @@ void opcao3(INDICE* indice1, INDICE* indice2, INDICE* indice3, FILE* saida1, FIL
 	reg->nomeEmp = readStr(1000);
 
 	// inserindo
+	fprintf(stderr, "Inserindo no arquivo 1\n");
 	if (inserirFF(saida1, indice1, reg))
+		printf("Rgistro inserido com sucesso\n");
+	else
+		printf("Erro ao inserir registro. Tente novamente.\n");
+
+	fprintf(stderr, "Inserindo no arquivo 2\n");
+	if (inserirFF(saida2, indice2, reg))
+		printf("Rgistro inserido com sucesso\n");
+	else
+		printf("Erro ao inserir registro. Tente novamente.\n");
+
+	fprintf(stderr, "Inserindo no arquivo 3\n");
+	if (inserirFF(saida3, indice3, reg))
 		printf("Rgistro inserido com sucesso\n");
 	else
 		printf("Erro ao inserir registro. Tente novamente.\n");
@@ -207,14 +233,11 @@ void opcao4(INDICE* indice1, INDICE* indice2, INDICE* indice3) {
 }
 
 void opcao5(FILE *file1, FILE *file2, FILE *file3) {
-	printf("Lista de removidos do primeiro arquivo\n");
-	getchar();
+	printf("\nLista de removidos do primeiro arquivo\n\n");
 	listarRemovidos(file1);
-	printf("Lista de removidos do segundo arquivo\n");
-	getchar();
+	printf("\nLista de removidos do segundo arquivo\n\n");
 	listarRemovidos(file2);
-	printf("Lista de removidos do terceiro arquivo\n");
-	getchar();
+	printf("\nLista de removidos do terceiro arquivo\n\n");
 	listarRemovidos(file3);
 }
 
