@@ -97,7 +97,7 @@ void indices_estat(INDICE* indiceR1, INDICE* indiceR2, INDICE* indiceR3){
 	char last_chave[SIZE_CNPJ + 1];
 	int count, i;
 
-	printf("Arquivo de Indice 1\n");
+	//printf("Arquivo de Indice 1\n");
 	printf("Indice Primario \t// Quantidade\n");
 	strcpy(last_chave,indiceR1->lista[0]->chave);
 	count = 1;
@@ -111,7 +111,7 @@ void indices_estat(INDICE* indiceR1, INDICE* indiceR2, INDICE* indiceR3){
 			strcpy(last_chave,indiceR1->lista[i]->chave);
 		}
 	}
-	printf("%s \t// %d\n",last_chave, count);
+	printf("%s \t//     %d\n",last_chave, count);
 	/*
 	printf("Arquivo de Indice 2\n");
 	printf("Indice Primario \t// Quantidade\n");
@@ -147,7 +147,7 @@ void indices_estat(INDICE* indiceR1, INDICE* indiceR2, INDICE* indiceR3){
 	printf("%s \t//     %d\n",last_chave, count);
 	*/
 
-	printf("\nArquivo \t\t//CNPJ \t// Byte Offset\n");
+	printf("\nArquivo \t\t//CNPJ \t\t\t// Byte Offset\n");
 	for(i=0;i<indiceR1->tamanho;i++){
 		printf("Registro %d\n", i+1);
 		printf("Arquivo de Indice 1 \t// %s \t// %ld\n",indiceR1->lista[i]->chave, indiceR1->lista[i]->referencia);
