@@ -165,9 +165,25 @@ INDICE* criar_indices(FILE *saida) {
         exit(0);
     }
 
+    free(reg);
+
     // retornar índice (em memória primária)
     return indice;
+}
 
+
+void deletar_indice(INDICE **indice){
+
+    if(!indice || !(*indice)) return;
+
+    int i;
+
+    for(i = 0; i < (*indice)->tamanho; i++){
+        free((*indice)->lista[i]);
+    }
+
+    free((*indice)->lista);
+    free(*indice);
 }
 
 /*  Descrição:
@@ -220,7 +236,6 @@ void _remover_dado(FILE* file, long int referencia){
     fseek (file, 0, SEEK_SET);
 
     // atualiza a lista de remoção
-    fprintf(stderr, "ATUALIZANDO HEAD: %ld\n", referencia);
     fwrite(&referencia, sizeof(long int), 1, file);
 
     // soma o tamanho dos campos fixos
@@ -239,17 +254,14 @@ void _remover_dado(FILE* file, long int referencia){
     // fseek até o inicio do registro a ser deletado
     fseek(file, referencia, SEEK_SET);
 
-    fprintf(stderr, "GRAVANDO EXC_LOG EM %ld\n", ftell(file));
     
     // grava o caracter de exclusão lógica
     fwrite(&exc_log, sizeof(char), 1, file);
 
-    fprintf(stderr, "GRAVANDO TAM REG EM %ld: %d\n", ftell(file), sizeReg);
 
     // grava o tamanho do registro
     fwrite(&sizeReg, sizeof(int), 1, file);
 
-    fprintf(stderr, "GRAVANDO HEAD EM %ld: %ld\n", ftell(file), head);
 
     // grava o byte ofsset do próximo registro removido (antiga cabeça da lista)
     fwrite(&head, sizeof(long int), 1, file);
@@ -558,6 +570,8 @@ INDICE* atualizar_indice(INDICE* indice) {
         }
         indice->lista[j+1] = copiar_no(indice->lista[j+1], atual);
     }
+
+    free(atual);
 
     return indice;
 }
